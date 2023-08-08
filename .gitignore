@@ -1,1 +1,8 @@
 env/*
+.vercel
+node_modules
+.firebase/*
+.firebaserc
+**/.DS_Store
+**/venv/*
+**/env/*
