@@ -11,10 +11,12 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import validator from 'validator';
 
+import firebaseApp from '@/firebase/config';
+import {getAuth, sendSignInLinkToEmail} from 'firebase/auth';
+
 
 export default function Onboarding () {
     const router = useRouter();
-    
     // input state
     const [formData, setFormData] = useState({
         url: '',
@@ -67,7 +69,31 @@ export default function Onboarding () {
     const handleSubmit = (e) => {
         const errors = validateForm();
         if(Object.keys(errors).length === 0){
-            console.log("Form successful")
+            const auth = getAuth(firebaseApp);
+            sendSignInLinkToEmail(auth, formData.email, {
+                url: "http://localhost:3000/finishSignUp?blogUrl=" + formData.url,
+                handleCodeInApp: true
+            })
+            .then(() => {
+                // The link was successfully sent. 
+                // Save the email locally so you don't need to ask the user for it again
+                // if they open the link on the same device.
+                window.localStorage.setItem('emailForSignIn', formData.email);
+
+                // Inform the user.
+                router.push("/checkYourEmail")
+
+            })
+            .catch((error) => {
+                console.log("Error Code: " + error.code)
+                console.log("Error Message: " + error.message)
+                let errorMessage = "Email sign in didn't work."
+                setFormErrors({
+                    urlError: errorMessage,
+                    frequencyError: errorMessage,
+                    emailError: errorMessage
+                })
+            });
         } else{
             setFormErrors((prevFormErrors) => ({
                 ...prevFormErrors,
@@ -156,7 +182,7 @@ export default function Onboarding () {
                         <Button
                             onClick={handleSubmit}
                             >
-                            Submit
+                            Create My Account
                         </Button>
                     </CardBody>
                 </Card>
