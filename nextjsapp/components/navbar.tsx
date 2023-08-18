@@ -1,10 +1,10 @@
 import {
-	Kbd,
-	Input,
 	Navbar as NextUINavbar,
 	NavbarContent,
 	NavbarBrand,
 	NavbarItem,
+    Button,
+    Link
 } from "@nextui-org/react";
 
 import { link as linkStyles } from "@nextui-org/theme";
@@ -13,18 +13,14 @@ import { siteConfig } from "@/config/site";
 import NextLink from "next/link";
 import clsx from "clsx";
 
-import { ThemeSwitch } from "@/components/theme-switch";
-import {
-	TwitterIcon,
-	GithubIcon,
-	DiscordIcon,
-	HeartFilledIcon,
-	SearchIcon,
-} from "@/components/icons";
-
 import { Logo } from "@/components/icons";
+import { useRouter } from "next/router";
 
 export const Navbar = () => {
+    const router = useRouter()
+    const handleClick = () => {
+        router.push('/app')
+    }
 	return (
 		<NextUINavbar maxWidth="xl" position="sticky">
 			<NavbarContent className="basis-1/5 sm:basis-full" justify="start">
@@ -50,6 +46,17 @@ export const Navbar = () => {
 						</NavbarItem>
 					))}
 				</div>
+                <div className="justify-end gap-4 ml-2">
+                    <Button
+                        href="/app"
+                        as={Link}
+                        color="primary"
+                        showAnchorIcon
+                        variant="solid"
+                    >
+                        Open App
+                    </Button>
+                </div>
 			</NavbarContent>
 		</NextUINavbar>
 	);

@@ -1,6 +1,5 @@
 import { title, subtitle } from "@/components/primitives";
 import DefaultLayout from "@/layouts/default";
-import {UrlForm} from "@/components/urlForm";
 import { Button, Input } from "@nextui-org/react";
 import { useState } from "react";
 import { useRouter } from "next/router";
@@ -19,7 +18,7 @@ export default function IndexPage() {
             url: blogUrl
         }
         router.push({
-            pathname: "/onboarding",
+            pathname: "/signUp",
             query: queryParams
         })
     }
@@ -56,7 +55,7 @@ export default function IndexPage() {
                 />
                 <div className="w-5"/>
                 <Button color="primary" onClick={handleOnClick}>
-                    Get posts
+                    Get Started
                 </Button>
 			</div>
 		</section>

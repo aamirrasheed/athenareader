@@ -4,17 +4,16 @@ import { useRouter } from "next/router";
 import { Button } from "@nextui-org/react";
 
 import { getAuth, isSignInWithEmailLink, signInWithEmailLink } from "firebase/auth";
-import firebaseApp from "../firebase/config";
 
 export default function FinishSignUp() {
     const router = useRouter();
     const [userEmail, setUserEmail] = useState("")
     const handleClick = () => {
-        router.push("/dashboard")
+        router.push("/app")
     }
     useEffect(() => {
         // Confirm the link is a sign-in with email link.
-        const auth = getAuth(firebaseApp);
+        const auth = getAuth();
         if (isSignInWithEmailLink(auth, window.location.href)) {
             // Additional state parameters can also be passed via URL.
             // This can be used to continue the user's intended action before triggering
@@ -25,7 +24,6 @@ export default function FinishSignUp() {
             // the flow on the same device where they started it.
             let email = window.localStorage.getItem('emailForSignIn');
 
-            // TODO:
             if (!email) {
                 // User opened the link on a different device. To prevent session fixation
                 // attacks, ask the user to provide the associated email again. For example:

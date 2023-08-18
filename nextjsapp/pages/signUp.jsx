@@ -11,11 +11,10 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import validator from 'validator';
 
-import firebaseApp from '@/firebase/config';
 import {getAuth, sendSignInLinkToEmail} from 'firebase/auth';
 
 
-export default function Onboarding () {
+export default function SignUp () {
     const router = useRouter();
     // input state
     const [formData, setFormData] = useState({
@@ -30,6 +29,9 @@ export default function Onboarding () {
         frequencyError: '',
         emailError: ''
     })
+
+    // email sent state
+    const [emailSent, setEmailSent] = useState(false)
     
     // Get and load the URL query params when page loads
     useEffect(() => {
@@ -69,7 +71,7 @@ export default function Onboarding () {
     const handleSubmit = (e) => {
         const errors = validateForm();
         if(Object.keys(errors).length === 0){
-            const auth = getAuth(firebaseApp);
+            const auth = getAuth();
             sendSignInLinkToEmail(auth, formData.email, {
                 url: "http://localhost:3000/finishSignUp?blogUrl=" + formData.url,
                 handleCodeInApp: true
@@ -79,15 +81,12 @@ export default function Onboarding () {
                 // Save the email locally so you don't need to ask the user for it again
                 // if they open the link on the same device.
                 window.localStorage.setItem('emailForSignIn', formData.email);
-
-                // Inform the user.
-                router.push("/checkYourEmail")
-
+                setEmailSent(true)
             })
             .catch((error) => {
                 console.log("Error Code: " + error.code)
                 console.log("Error Message: " + error.message)
-                let errorMessage = "Email sign in didn't work."
+                let errorMessage = "Email sign up link didn't work."
                 setFormErrors({
                     urlError: errorMessage,
                     frequencyError: errorMessage,
@@ -139,51 +138,55 @@ export default function Onboarding () {
             <div className="flex flex-col mt-4 w-1/3 gap-10">
                 <Card>
                     <CardBody>
-                        <Input
-                            isRequired
-                            label="URL"
-                            value={formData.url}
-                            onChange={handleUrlChange}
-                            validationState={formErrors.urlError === "" ? "valid" : "invalid"}
-                            errorMessage={formErrors.urlError}
-                        />
-                        <Spacer y={6}/>
-                        <RadioGroup
-                            label="How often do you want to receive posts?"
-                            value={formData.frequency}
-                            orientation="horizontal"
-                            validationState={formErrors.frequencyError === "" ? "valid" : "invalid"}
-                            errorMessage={formErrors.frequencyError}
-                            defaultValue="weekly"
-                        >
-                            <Radio 
-                                value="daily"
-                                onChange={handleFrequencyChange}
+                        {emailSent ? <h1>Check your email</h1> :
+                        <>
+                            <Input
+                                isRequired
+                                label="URL"
+                                value={formData.url}
+                                onChange={handleUrlChange}
+                                validationState={formErrors.urlError === "" ? "valid" : "invalid"}
+                                errorMessage={formErrors.urlError}
+                            />
+                            <Spacer y={6}/>
+                            <RadioGroup
+                                label="How often do you want to receive posts?"
+                                value={formData.frequency}
+                                orientation="horizontal"
+                                validationState={formErrors.frequencyError === "" ? "valid" : "invalid"}
+                                errorMessage={formErrors.frequencyError}
+                                defaultValue="weekly"
                             >
-                                Daily at 8am
-                            </Radio>
-                            <Radio 
-                                value="weekly"
-                                onChange={handleFrequencyChange}
-                            >
-                                Mondays at 8am
-                            </Radio>
-                        </RadioGroup>
-                        <Spacer y={6}/>
-                        <Input 
-                            isRequired
-                            label="Email"
-                            value={formData.email}
-                            onChange={handleEmailChange}
-                            validationState={formErrors.emailError === "" ? "valid" : "invalid"}
-                            errorMessage={formErrors.emailError}
-                        />
-                        <Spacer y={6}/>
-                        <Button
-                            onClick={handleSubmit}
-                            >
-                            Create My Account
-                        </Button>
+                                <Radio 
+                                    value="daily"
+                                    onChange={handleFrequencyChange}
+                                >
+                                    Daily at 8am
+                                </Radio>
+                                <Radio 
+                                    value="weekly"
+                                    onChange={handleFrequencyChange}
+                                >
+                                    Mondays at 8am
+                                </Radio>
+                            </RadioGroup>
+                            <Spacer y={6}/>
+                            <Input 
+                                isRequired
+                                label="Email"
+                                value={formData.email}
+                                onChange={handleEmailChange}
+                                validationState={formErrors.emailError === "" ? "valid" : "invalid"}
+                                errorMessage={formErrors.emailError}
+                            />
+                            <Spacer y={6}/>
+                            <Button
+                                onClick={handleSubmit}
+                                >
+                                Create My Account
+                            </Button>
+                        </>
+                        }
                     </CardBody>
                 </Card>
             </div>
