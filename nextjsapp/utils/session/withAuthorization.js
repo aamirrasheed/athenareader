@@ -10,16 +10,23 @@ const withAuthorization = condition => Component => {
     const firebaseAuth = getAuth()
 
     useEffect(() => {
-      const listener = onAuthStateChanged(firebaseAuth,
-        user => {
-          if (!condition(user)) {
+        
+        // if user navigates directly to protected route without being logged in
+        if(!condition(firebaseAuth.currentUser)){
             router.replace('/')
-          }
         }
-      );
-      return () => {
-        listener()
-      }
+
+        // if user logs out while inside the app
+        const listener = onAuthStateChanged(firebaseAuth,
+            user => {
+            if (!condition(user)) {
+                router.replace('/')
+            }
+            }
+        );
+        return () => {
+            listener()
+        }
     },[])
 
     return condition(firebaseAuth.currentUser) ? <Component {...props}/> : "Unauthorized" 
