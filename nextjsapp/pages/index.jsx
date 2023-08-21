@@ -1,33 +1,8 @@
 import { title, subtitle } from "@/components/primitives";
 import DefaultLayout from "@/layouts/default";
-import { Button, Input } from "@nextui-org/react";
-import { useState } from "react";
-import { useRouter } from "next/router";
+import { Button, Link } from "@nextui-org/react";
 
 export default function IndexPage() {
-    const [blogUrl, setBlogUrl] = useState("")
-    
-    const router = useRouter();
-
-    const handleInputChange = (e) => {
-        setBlogUrl(e.target.value)
-    }
-
-    let handleOnClick = () => {
-        const queryParams = {
-            url: blogUrl
-        }
-        router.push({
-            pathname: "/signUp",
-            query: queryParams
-        })
-    }
-
-    let handleKeyDown = (e) => {
-        if (e.key == "Enter"){
-            handleOnClick()
-        }
-    }
 
 	return (
 		<DefaultLayout>
@@ -42,19 +17,12 @@ export default function IndexPage() {
 				</h2>
 			</div>
 
-			<div className="flex flex-row mt-4 w-1/3">
-                <Input
-                    placeholder="Enter the URL of your favorite blog..."
-                    className="w-full"
-                    name="url"
-                    id="url"
-                    isClearable={false}
-                    value={blogUrl}
-                    onChange={handleInputChange}
-                    onKeyDown={handleKeyDown}
-                />
-                <div className="w-5"/>
-                <Button color="primary" onClick={handleOnClick}>
+			<div className="flex flex-row mt-4 w-1/3 justify-center">
+                <Button 
+                    color="primary"
+                    href="/signup"
+                    as={Link}
+                >
                     Get Started
                 </Button>
 			</div>

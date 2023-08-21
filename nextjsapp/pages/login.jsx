@@ -1,22 +1,15 @@
 import { 
     Input,
-    Radio,
-    RadioGroup,
     Card,
     CardBody,
     Spacer,
     Button,
 } from "@nextui-org/react";
 import { useState } from "react";
-
 import validator from 'validator'
 
 import {doSendSignInLinkToEmail} from '@/utils/firebase'
 
-export const FREQUENCY_CHOICES = {
-    daily: "Daily",
-    weekly: "Weekly"
-}
 export const INITIAL_FORM_STATE = {
     email: "",
 }
@@ -68,7 +61,8 @@ export default function SignUp () {
                     <CardBody>
                         { emailSent ? <h1>Check your email!</h1> :
                             <>
-                                <h1>Sign up for an account!</h1>
+                                <h1>Sign in for an account!</h1>
+                                <a href="/signup">Don't have an account? Sign up</a>
                                 <Spacer y={4}/>
                                 <Input 
                                     isRequired
@@ -82,27 +76,6 @@ export default function SignUp () {
                                     validationState={formErrors.email === "" ? "valid" : "invalid"}
                                     errorMessage={formErrors.email}
                                 />
-                                <Spacer y={6}/>
-                                <RadioGroup
-                                    isRequired
-                                    label="How often do you want to receive posts?"
-                                    orientation="horizontal"
-                                    value={formData.frequency}
-                                    defaultValue={FREQUENCY_CHOICES.daily}
-                                >
-                                    <Radio 
-                                        value={FREQUENCY_CHOICES.daily}
-                                        onChange={e => setFormData({...formData, frequency: e.target.value})}
-                                    >
-                                        Daily at 8am
-                                    </Radio>
-                                    <Radio 
-                                        value={FREQUENCY_CHOICES.weekly}
-                                        onChange={e => setFormData({...formData, frequency: e.target.value})}
-                                    >
-                                        Mondays at 8am
-                                    </Radio>
-                                </RadioGroup>
                                 <Spacer y={6}/>
                                 <Button
                                     onClick={handleSubmit}

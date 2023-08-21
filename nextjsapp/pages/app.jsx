@@ -1,23 +1,94 @@
-import { Button } from "@nextui-org/react"
-import withAuthorization from "../utils/session/withAuthorization"
+import {
+    Modal,
+    ModalContent,
+    ModalHeader,
+    ModalBody,
+    ModalFooter,
+    Button,
+    useDisclosure,
+    Card,
+    CardBody,
+    RadioGroup,
+    Radio
+} from "@nextui-org/react";
 
-import {getAuth, signOut} from "firebase/auth"
+import {withAuth} from "@/utils/withAuth"
+
+import {
+    doSignOut,
+    getCurrentUser
+} from "@/utils/firebase"
+
+import { useState } from "react";
 
 function App() {
-    const auth = getAuth()
+    const [frequency, setFrequency] = useState("")
+
+    const {isOpen, onOpen, onOpenChange} = useDisclosure();
     
-    const handleSignOutClick = e => {
-        signOut(auth);    
-    }
     return(
-        <>
-            <h1>This is the logged in app!</h1>
-            <p>Your email is {auth.currentUser ? auth.currentUser.email : 'unknown'}.</p>
-            <Button onClick={handleSignOutClick}>Sign Out</Button>
-        </>
+        <div className="flex flex-col items-center justify-center">
+            <div className="flex flex-col mt-4 w-1/3 gap-10">
+                
+                <Card>
+                    <CardBody>
+                        <h1>User Info</h1>
+                        <p>Your email is {getCurrentUser() ? getCurrentUser().email : 'unknown'}.</p>
+                        <p>You're receiving emails <b>weekly</b> </p>
+                        <Button
+                            onClick={doSignOut}
+                        >
+                            Sign Out
+                        </Button>
+                        <Button>Change Frequency</Button>
+                        <Button onPress={onOpen} color="primary">Open Modal</Button>
+                        <Modal 
+                            isOpen={isOpen} 
+                            onOpenChange={onOpenChange}
+                            placement="top-center"
+                        >
+                            <ModalContent>
+                            {(onClose) => (
+                                <>
+                                <ModalHeader className="flex flex-col gap-1">Change Frequency of Emails</ModalHeader>
+                                <ModalBody>
+                                    <RadioGroup
+                                        label="How often do you want to receive posts?"
+                                        value={frequency}
+                                        orientation="horizontal"
+                                        defaultValue="weekly"
+                                    >
+                                        <Radio 
+                                            value="daily"
+                                            onChange={() => setFrequency("daily")}
+                                        >
+                                            Daily at 8am
+                                        </Radio>
+                                        <Radio 
+                                            value="weekly"
+                                            onChange={() => setFrequency("weekly")}
+                                        >
+                                            Mondays at 8am
+                                        </Radio>
+                                    </RadioGroup>
+                                </ModalBody>
+                                <ModalFooter>
+                                    <Button color="danger" variant="flat" onPress={onClose}>
+                                    Close
+                                    </Button>
+                                    <Button color="primary" onPress={onClose}>
+                                    Sign in
+                                    </Button>
+                                </ModalFooter>
+                                </>
+                            )}
+                            </ModalContent>
+                        </Modal>
+                    </CardBody>
+                </Card>
+             </div>
+        </div>
     )
 }
 
-// make sure the authUser exists
-let condition = authUser => !!authUser
-export default withAuthorization(condition)(App)
+export default withAuth(App)
