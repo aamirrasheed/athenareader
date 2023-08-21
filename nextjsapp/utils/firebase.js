@@ -41,6 +41,8 @@ const doOnAuthStateChanged = (callback) => onAuthStateChanged(firebaseAuth, call
 
 const getCurrentUser = () => firebaseAuth.currentUser;
 
+const unsubscribeFromBlog = (blog) => console.log('unsubscribeFromBlog called for', blog);
+
 export { 
     doSendSignInLinkToEmail,
     doIsSignInWithEmailLink,
@@ -48,4 +50,5 @@ export {
     doSignOut,
     doOnAuthStateChanged,
     getCurrentUser,
+    unsubscribeFromBlog,
 }

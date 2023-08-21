@@ -61,8 +61,8 @@ export default function SignUp () {
                     <CardBody>
                         { emailSent ? <h1>Check your email!</h1> :
                             <>
-                                <h1>Sign in for an account!</h1>
-                                <a href="/signup">Don't have an account? Sign up</a>
+                                <h1>Sign in!</h1>
+                                <a href="/signup" className="text-blue-500 text-sm">Don't have an account? Sign up</a>
                                 <Spacer y={4}/>
                                 <Input 
                                     isRequired
@@ -81,7 +81,7 @@ export default function SignUp () {
                                     onClick={handleSubmit}
                                     isDisabled={shallowEquals(formData, INITIAL_FORM_STATE) || !shallowEquals(formErrors, INITIAL_FORM_STATE)}
                                 >
-                                    Create an account
+                                    Log In
                                 </Button>
                             </>
                         }
