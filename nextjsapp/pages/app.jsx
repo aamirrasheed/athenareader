@@ -21,12 +21,14 @@ import {withAuth} from "@/utils/withAuth"
 import {
     doSignOut,
     getCurrentUser,
-    unsubscribeFromBlog
+    unsubscribeFromWebsite
 } from "@/utils/firebase"
 
 import { useState } from "react";
 
-const FAKE_BLOGS = [
+import {FREQUENCY_CHOICES} from "@/utils/constants"
+
+const FAKE_WEBSITES = [
     "paulgraham.com",
     "blog.samaltman.com",
     "markmanson.com",
@@ -34,19 +36,17 @@ const FAKE_BLOGS = [
     "aamirrasheed.substack.com"
 ]
 
-const FAKE_FREQUENCY = "weekly"
-
 function App() {
 
-    const [savedFrequency, setSavedFrequency] = useState(FAKE_FREQUENCY)
-    const [formFrequency, setFormFrequency] = useState(FAKE_FREQUENCY)
+    const [savedFrequency, setSavedFrequency] = useState("NOT LOADED")
+    const [formFrequency, setFormFrequency] = useState("NEED TO LOAD")
 
-    const [blogs, setBlogs] = useState(FAKE_BLOGS)
-    const [blogToAdd, setBlogToAdd] = useState("")
+    const [websites, setWebsites] = useState(FAKE_WEBSITES)
+    const [websiteToAdd, setWebsiteToAdd] = useState("")
 
     const {isOpen: isOpenFrequencyModal, onOpen: onOpenFrequencyModal, onOpenChange: onOpenChangeFrequencyModal} = useDisclosure();
 
-    const {isOpen: isOpenAddBlogModal, onOpen: onOpenAddBlogModal, onOpenChange: onOpenChangeAddBlogModal} = useDisclosure();
+    const {isOpen: isOpenAddWebsiteModal, onOpen: onOpenAddWebsiteModal, onOpenChange: onOpenChangeAddWebsiteModal} = useDisclosure();
 
     return(
         <div className="flex flex-col items-center justify-center">
@@ -84,14 +84,14 @@ function App() {
                                         defaultValue={savedFrequency}
                                     >
                                         <Radio 
-                                            value="daily"
-                                            onChange={() => setFormFrequency("daily")}
+                                            value={FREQUENCY_CHOICES.daily}
+                                            onChange={() => setFormFrequency(FREQUENCY_CHOICES.daily)}
                                         >
                                             Daily at 8am
                                         </Radio>
                                         <Radio 
-                                            value="weekly"
-                                            onChange={() => setFormFrequency("weekly")}
+                                            value={FREQUENCY_CHOICES.weekly}
+                                            onChange={() => setFormFrequency(FREQUENCY_CHOICES)}
                                         >
                                             Mondays at 8am
                                         </Radio>
@@ -116,31 +116,31 @@ function App() {
                         <p className="text-2xl self-start">Subscriptions</p>
                         <Button
                             color="secondary"
-                            onPress={onOpenAddBlogModal}
+                            onPress={onOpenAddWebsiteModal}
                             size="sm"
                             className="self-end"
                         >
-                            Add Blog
+                            Add Website
                         </Button>
                         <Modal 
-                            isOpen={isOpenAddBlogModal} 
-                            onOpenChange={onOpenChangeAddBlogModal}
+                            isOpen={isOpenAddWebsiteModal} 
+                            onOpenChange={onOpenChangeAddWebsiteModal}
                             placement="top-center"
                         >
                             <ModalContent>
                             {(onClose) => (
                                 <>
-                                <ModalHeader className="flex flex-col gap-1">Add New Blog</ModalHeader>
+                                <ModalHeader className="flex flex-col gap-1">Add New Website</ModalHeader>
                                 <ModalBody>
                                     <Input
-                                        label="Blog URL"
-                                        value={blogToAdd}
-                                        onChange={e => setBlogToAdd(e.target.value)}
+                                        label="Website URL"
+                                        value={websiteToAdd}
+                                        onChange={e => setWebsiteToAdd(e.target.value)}
                                     />
                                 </ModalBody>
                                 <ModalFooter>
                                     <Button color="primary" onPress={()=>{
-                                        setBlogs([...blogs, blogToAdd])
+                                        setWebsites([...websites, websiteToAdd])
                                         onClose()
                                     }}>
                                         Save 
@@ -153,13 +153,13 @@ function App() {
                     </CardHeader>
                     <Divider/>
                     <CardBody>
-                        {blogs.map(blog => (
-                            <div key={blog}>
+                        {websites.map(website => (
+                            <div key={website}>
                             <div className="flex flex-row items-center justify-between">
-                                <p>{blog}</p>
+                                <p>{website}</p>
                                 <Button 
                                     color="danger" 
-                                    onPress={() => unsubscribeFromBlog(blog)}
+                                    onPress={() => unsubscribeFromWebsite(website)}
                                     size="sm"
                                 >
                                     Unsubscribe

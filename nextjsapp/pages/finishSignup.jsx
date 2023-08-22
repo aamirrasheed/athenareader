@@ -6,9 +6,11 @@ import { Button } from "@nextui-org/react";
 import {
     doIsSignInWithEmailLink, 
     doSignInWithEmailLink,
+    doCheckIfUserExists,
+    doCreateUser,
 } from '@/utils/firebase'
 
-export default function FinishLogin() {
+export default function FinishSignUp() {
     const router = useRouter();
     const [userEmail, setUserEmail] = useState("")
     const handleClick = () => {
@@ -28,8 +30,17 @@ export default function FinishLogin() {
                 // attacks, ask the user to provide the associated email again. For example:
                 email = window.prompt('Please provide your email for confirmation');
             }
-            
-            doSignInWithEmailLink(email, window.location.href).then((result) => {
+
+            // if signup=true and frequency is passed into the link, then we need to create the user
+            doCheckIfUserExists(email).then((exists) => {
+                console.log("finishLogin: doCheckIfUserExists: ", exists)
+                if(!exists && router.query.signUp && router.query.frequency){
+                    console.log("Creating user!")
+                    return doCreateUser(email, router.query.frequency)
+                }
+            })
+            .then(() => doSignInWithEmailLink(email, window.location.href))
+            .then((result) => {
                 // Clear email from storage.
                 window.localStorage.removeItem('emailForSignIn');
                 // You can access the new user via result.user

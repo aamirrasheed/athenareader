@@ -11,16 +11,18 @@ import { useState } from "react";
 
 import validator from 'validator'
 
-import {doSendSignInLinkToEmail} from '@/utils/firebase'
+import {
+    doSendSignInLinkToEmail,
+    doCheckIfUserExists
+} from '@/utils/firebase'
 
-export const FREQUENCY_CHOICES = {
-    daily: "Daily",
-    weekly: "Weekly"
-}
-export const INITIAL_FORM_STATE = {
+import {FREQUENCY_CHOICES} from '@/utils/constants'
+
+const INITIAL_FORM_STATE = {
     email: "",
+    frequency: FREQUENCY_CHOICES.daily
 }
-export const EMAIL_ERROR_MSG = "Invalid Email"
+const EMAIL_ERROR_MSG = "Invalid Email"
 
 
 export default function SignUp () {
@@ -38,9 +40,19 @@ export default function SignUp () {
     
     // send off authentication link to user!
     const handleSubmit = (e) => {
-        doSendSignInLinkToEmail(formData.email, {
-            url: `${window.location.origin}/finishLogin`,
-            handleCodeInApp: true
+        doCheckIfUserExists(formData.email).then((exists) => {
+            if(exists){
+                // user already exists, so we don't want to tell them
+                setEmailSent(true)
+                return
+            }
+            else {
+                // user dosen't exist yet
+                return doSendSignInLinkToEmail(formData.email, {
+                    url: `${window.location.origin}/finishLogin?signUp=true&frequency=${formData.frequency}`,
+                    handleCodeInApp: true
+                })
+            }
         })
         .then(() => {
             // The link was successfully sent. 
@@ -52,11 +64,10 @@ export default function SignUp () {
         .catch((error) => {
             console.log("Error Code: " + error.code)
             console.log("Error Message: " + error.message)
-            let errorMessage = "Email sign up link didn't work."
+            let errorMessage = "Email sign up link didn't work. Check console"
             setFormErrors({
-                urlError: errorMessage,
-                frequencyError: errorMessage,
-                emailError: errorMessage
+                frequency: errorMessage,
+                email: errorMessage
             })
         });
     }
@@ -66,7 +77,7 @@ export default function SignUp () {
             <div className="flex flex-col mt-4 w-1/3 gap-10">
                 <Card>
                     <CardBody>
-                        { emailSent ? <h1>Check your email!</h1> :
+                        { emailSent ? <h1>If this account doesn't already exist, we've sent you an email to log in!</h1> :
                             <>
                                 <h1>Sign up for an account!</h1>
                                 <Spacer y={4}/>

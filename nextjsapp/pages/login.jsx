@@ -31,9 +31,19 @@ export default function SignUp () {
     
     // send off authentication link to user!
     const handleSubmit = (e) => {
-        doSendSignInLinkToEmail(formData.email, {
-            url: `${window.location.origin}/finishLogin`,
-            handleCodeInApp: true
+        doCheckIfUserExists(formData.email).then((exists) => {
+            if(exists){
+                // user already exists, so we don't want to tell them
+                setEmailSent(true)
+                return
+            }
+            else {
+                // user dosen't exist yet
+                return doSendSignInLinkToEmail(formData.email, {
+                    url: `${window.location.origin}/finishLogin`,
+                    handleCodeInApp: true
+                })
+            }
         })
         .then(() => {
             // The link was successfully sent. 

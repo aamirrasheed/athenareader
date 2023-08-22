@@ -13,7 +13,7 @@ export default function IndexPage() {
 					to anything on the internet.
 				</h1>
 				<h2 className={subtitle({ class: "mt-4" })}>
-					Historical posts for any blog, straight to your inbox.
+					Historical posts for any website, straight to your inbox.
 				</h2>
 			</div>
 

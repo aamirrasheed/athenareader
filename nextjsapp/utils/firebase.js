@@ -1,4 +1,7 @@
-import {initializeApp, getApps} from 'firebase/app';
+import {
+    initializeApp,
+    getApps
+} from 'firebase/app';
 import {
     getAuth,
     setPersistence,
@@ -8,7 +11,18 @@ import {
     isSignInWithEmailLink,
     signInWithEmailLink,
     signOut,
+    connectAuthEmulator,
 } from 'firebase/auth';
+import { 
+    getDatabase, 
+    connectDatabaseEmulator,
+    ref,
+    set,
+    get,
+    orderByChild,
+    query,
+    equalTo,
+} from "firebase/database";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAhEQFLIgWUrs_lsxQEZcHnzq6IWCPTy7w",
@@ -22,13 +36,48 @@ const firebaseConfig = {
 };
 
 let firebaseAuth;
+let firebaseDb;
 
-if (!getApps().length) {
-  const firebaseApp = initializeApp(firebaseConfig);
-  firebaseAuth = getAuth(firebaseApp);
-  setPersistence(firebaseAuth, browserLocalPersistence);
+// init database function
+const setUpDatabase = () => {
+    const usersRef = ref(firebaseDb, 'users');
+    const websitesRef = ref(firebaseDb, 'websites');
+
+    // set up a dummy user and dummy website
+    set(usersRef, {
+        'dummyuser': {
+            email: 'dummyuser@dummyuser.com'
+        }
+    });
+
+    set(websitesRef, {
+        'dummywebsite': {
+            name: 'dummywebsite',
+            url: 'https://dummywebsite.com',
+        }
+    });
 }
 
+if (!getApps().length) {
+    const firebaseApp = initializeApp(firebaseConfig);
+
+    // initialize auth
+    firebaseAuth = getAuth(firebaseApp);
+    setPersistence(firebaseAuth, browserLocalPersistence);
+
+    // initialize realtime database
+    firebaseDb = getDatabase(firebaseApp)
+
+    // connect to firebase emulators while developing
+    if (process.env.NODE_ENV === 'development') {
+        connectAuthEmulator(firebaseAuth, 'http://127.0.0.1:9099');
+        connectDatabaseEmulator(firebaseDb, '127.0.0.1', '9000');
+    }   
+
+    setUpDatabase();
+}
+
+// auth functions
 const doSendSignInLinkToEmail = (email, actionCodeSettings) => sendSignInLinkToEmail(firebaseAuth, email, actionCodeSettings);
 
 const doIsSignInWithEmailLink = (emailLink) => isSignInWithEmailLink(firebaseAuth, emailLink);
@@ -41,7 +90,42 @@ const doOnAuthStateChanged = (callback) => onAuthStateChanged(firebaseAuth, call
 
 const getCurrentUser = () => firebaseAuth.currentUser;
 
-const unsubscribeFromBlog = (blog) => console.log('unsubscribeFromBlog called for', blog);
+// database functions
+const doCheckIfUserExists = (email) => {
+    return new Promise((resolve, reject) => {
+        const usersRef = ref(firebaseDb, 'users');
+        const userRef = query(usersRef, orderByChild('email'), equalTo(email));
+
+        get(userRef).then((snapshot) => {
+            if (snapshot.exists()) {
+                resolve(true);
+            } else {
+                resolve(false);
+            }
+        }).catch((error) => {
+            reject(error)
+        });
+    });
+  };
+
+const doCreateUser = (email, frequency) => {
+    const usersRef = ref(firebaseDb, 'users');
+    const newUserRef = push(usersRef); // Generate a new unique key for the user
+  
+    return set(newUserRef, {
+      email: email,
+      frequency: frequency,
+      dateJoined: new Date().toISOString()
+    });
+  };
+
+const doSubscribeUserToWebsites = (email, websites) => {
+    websites.forEach(website => {
+        set(ref(firebaseDb, `users/${email}/subscriptions/${website}`), true);
+    });
+}
+
+const unsubscribeFromWebsite = (email, website) => set(ref(firebaseDb, `users/${email}/subscriptions/${website}`), null);
 
 export { 
     doSendSignInLinkToEmail,
@@ -50,5 +134,8 @@ export {
     doSignOut,
     doOnAuthStateChanged,
     getCurrentUser,
-    unsubscribeFromBlog,
+    doCheckIfUserExists,
+    doCreateUser,
+    doSubscribeUserToWebsites,
+    unsubscribeFromWebsite,
 }
