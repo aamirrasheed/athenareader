@@ -8,7 +8,9 @@ import {
 import { useState } from "react";
 import validator from 'validator'
 
-import {doSendSignInLinkToEmail} from '@/utils/firebase'
+import {
+    doSendSignInLinkToEmail,
+} from '@/utils/firebase'
 
 export const INITIAL_FORM_STATE = {
     email: "",
@@ -29,22 +31,12 @@ export default function SignUp () {
             obj2.hasOwnProperty(key) && obj1[key] === obj2[key]
          )
     
-    // send off authentication link to user!
     const handleSubmit = (e) => {
-        doCheckIfUserExists(formData.email).then((exists) => {
-            if(exists){
-                // user already exists, so we don't want to tell them
-                setEmailSent(true)
-                return
+        doSendSignInLinkToEmail(formData.email, {
+                url: `${window.location.origin}/finishLogin`,
+                handleCodeInApp: true
             }
-            else {
-                // user dosen't exist yet
-                return doSendSignInLinkToEmail(formData.email, {
-                    url: `${window.location.origin}/finishLogin`,
-                    handleCodeInApp: true
-                })
-            }
-        })
+        )
         .then(() => {
             // The link was successfully sent. 
             // Save the email locally so you don't need to ask the user for it again
@@ -57,8 +49,6 @@ export default function SignUp () {
             console.log("Error Message: " + error.message)
             let errorMessage = "Email sign up link didn't work."
             setFormErrors({
-                urlError: errorMessage,
-                frequencyError: errorMessage,
                 emailError: errorMessage
             })
         });

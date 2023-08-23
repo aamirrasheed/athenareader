@@ -90,35 +90,6 @@ const doOnAuthStateChanged = (callback) => onAuthStateChanged(firebaseAuth, call
 
 const getCurrentUser = () => firebaseAuth.currentUser;
 
-// database functions
-const doCheckIfUserExists = (email) => {
-    return new Promise((resolve, reject) => {
-        const usersRef = ref(firebaseDb, 'users');
-        const userRef = query(usersRef, orderByChild('email'), equalTo(email));
-
-        get(userRef).then((snapshot) => {
-            if (snapshot.exists()) {
-                resolve(true);
-            } else {
-                resolve(false);
-            }
-        }).catch((error) => {
-            reject(error)
-        });
-    });
-  };
-
-const doCreateUser = (email, frequency) => {
-    const usersRef = ref(firebaseDb, 'users');
-    const newUserRef = push(usersRef); // Generate a new unique key for the user
-  
-    return set(newUserRef, {
-      email: email,
-      frequency: frequency,
-      dateJoined: new Date().toISOString()
-    });
-  };
-
 const doSubscribeUserToWebsites = (email, websites) => {
     websites.forEach(website => {
         set(ref(firebaseDb, `users/${email}/subscriptions/${website}`), true);
@@ -134,8 +105,6 @@ export {
     doSignOut,
     doOnAuthStateChanged,
     getCurrentUser,
-    doCheckIfUserExists,
-    doCreateUser,
     doSubscribeUserToWebsites,
     unsubscribeFromWebsite,
 }

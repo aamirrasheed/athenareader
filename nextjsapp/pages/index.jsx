@@ -20,7 +20,7 @@ export default function IndexPage() {
 			<div className="flex flex-row mt-4 w-1/3 justify-center">
                 <Button 
                     color="primary"
-                    href="/signup"
+                    href="/login"
                     as={Link}
                 >
                     Get Started

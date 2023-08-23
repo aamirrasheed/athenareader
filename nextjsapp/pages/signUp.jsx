@@ -47,7 +47,7 @@ export default function SignUp () {
                 return
             }
             else {
-                // user dosen't exist yet
+                // user doesn't exist yet
                 return doSendSignInLinkToEmail(formData.email, {
                     url: `${window.location.origin}/finishLogin?signUp=true&frequency=${formData.frequency}`,
                     handleCodeInApp: true
