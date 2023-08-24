@@ -19,6 +19,7 @@
     "eslint-config-next": "13.4.4",
     "firebase": "^10.1.0",
     "firebase-admin": "^11.10.1",
+    "firebase-functions": "^4.4.1",
     "framer-motion": "^10.12.20",
     "intl-messageformat": "^10.1.0",
     "next": "^13.4.9",

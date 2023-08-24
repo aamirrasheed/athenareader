@@ -18,10 +18,6 @@ import {
     connectDatabaseEmulator,
     ref,
     set,
-    get,
-    orderByChild,
-    query,
-    equalTo,
 } from "firebase/database";
 
 const firebaseConfig = {
@@ -38,25 +34,6 @@ const firebaseConfig = {
 let firebaseAuth;
 let firebaseDb;
 
-// init database function
-const setUpDatabase = () => {
-    const usersRef = ref(firebaseDb, 'users');
-    const websitesRef = ref(firebaseDb, 'websites');
-
-    // set up a dummy user and dummy website
-    set(usersRef, {
-        'dummyuser': {
-            email: 'dummyuser@dummyuser.com'
-        }
-    });
-
-    set(websitesRef, {
-        'dummywebsite': {
-            name: 'dummywebsite',
-            url: 'https://dummywebsite.com',
-        }
-    });
-}
 
 if (!getApps().length) {
     const firebaseApp = initializeApp(firebaseConfig);
@@ -74,7 +51,6 @@ if (!getApps().length) {
         connectDatabaseEmulator(firebaseDb, '127.0.0.1', '9000');
     }   
 
-    setUpDatabase();
 }
 
 // auth functions

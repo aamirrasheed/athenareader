@@ -9,16 +9,22 @@ import {
 } from '@/utils/firebase'
 
 const PAGE_STATE = {
+    LOADED: "LOADED",
     LOADING: "LOADING",
     ERROR: "ERROR",
     SUCCESS: "SUCCESS"
 }
 
+let num_times_called = 0
+
 export default function FinishLogin() {
     const router = useRouter();
-    const [pageState, setPageState] = useState(PAGE_STATE.LOADING)
+    const [pageState, setPageState] = useState(PAGE_STATE.LOADED)
 
     const signUserIn = () => {
+        console.log("called signUserIn " + num_times_called++)  
+
+        setPageState(PAGE_STATE.LOADING)
         // Confirm the link is a sign-in with email link.
         if (doIsSignInWithEmailLink(window.location.href)) {
 
@@ -58,16 +64,20 @@ export default function FinishLogin() {
         if(pageState === PAGE_STATE.SUCCESS) {
             router.push("/app")
         }
-        signUserIn()
 
-    }, [])
+    }, [pageState])
 
-    const handleRetry = () => {
-        setPageState(PAGE_STATE.LOADING)
+
+    const handleLogIn = () => {
         signUserIn()
     }
 
-    return pageState === PAGE_STATE.LOADING ?
+    return pageState === PAGE_STATE.LOADED ?
+                <div>
+                    <Button onClick={handleLogIn}>Log in</Button>
+                </div>
+            :
+            pageState === PAGE_STATE.LOADING ?
                 <div>
                     <h1>Finishing login...</h1>
                     <Spinner />
@@ -75,7 +85,7 @@ export default function FinishLogin() {
             :  pageState === PAGE_STATE.ERROR ?
                 <div>
                     <h1>There was an error finishing login. Click the button to try again</h1>
-                    <Button onClick={handleRetry}>Try again</Button>
+                    <Button onClick={handleLogIn}>Try again</Button>
                 </div>
             :  pageState === PAGE_STATE.SUCCESS ?
                 <div>
