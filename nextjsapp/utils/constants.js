@@ -1,4 +1,4 @@
 export const FREQUENCY_CHOICES = {
-    daily: "Daily",
-    weekly: "Weekly"
+    daily: "daily",
+    weekly: "weekly"
 }

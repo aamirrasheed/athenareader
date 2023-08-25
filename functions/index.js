@@ -6,8 +6,6 @@ const admin = require("firebase-admin");
 admin.initializeApp();
 
 exports.createUserInDatabaseOnSignup = functions.auth.user().onCreate((user, context) => {
-    console.log("Aamir is calling onCreate")
-    
     // create an entry for the user in realtime database
     admin.database().ref(`users/${user.uid}`).set({
         email: user.email,

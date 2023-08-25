@@ -13,7 +13,7 @@ const withAuth = (WrappedComponent) => {
         if (!user) {
           // Redirect to login page if user is not authenticated
           router.push('/login');
-        }else {
+        } else {
             setLoading(false)
         }
       });

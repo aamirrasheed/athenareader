@@ -64,23 +64,34 @@ const doSignOut = () => signOut(firebaseAuth);
 
 const doOnAuthStateChanged = (callback) => onAuthStateChanged(firebaseAuth, callback);
 
-const getCurrentUser = () => firebaseAuth.currentUser;
+const authUser = () => firebaseAuth.currentUser;
 
-const doSubscribeUserToWebsites = (email, websites) => {
-    websites.forEach(website => {
-        set(ref(firebaseDb, `users/${email}/subscriptions/${website}`), true);
-    });
+const user = uid => ref(firebaseDb, `users/${uid}`);
+
+function doSetUserFrequency(uid, frequency) { set(ref(firebaseDb, `users/${uid}/frequency`), frequency);}
+
+const doSubscribeUserToWebsite = (uid, website) => {
+    let url = new URL(website.includes('://') ? website : 'http://' + website);
+    let encoded_website = url.hostname.replace(/\./g, '%2E');
+    
+    return set(ref(firebaseDb, `users/${uid}/subscriptions/${encoded_website}`), true)
 }
 
-const unsubscribeFromWebsite = (email, website) => set(ref(firebaseDb, `users/${email}/subscriptions/${website}`), null);
+const doUnsubscribeUserFromWebsite = (uid, website) => {
+    let url = new URL(website.includes('://') ? website : 'http://' + website);
+    let encoded_website = url.hostname.replace(/\./g, '%2E');
+    return set(ref(firebaseDb, `users/${uid}/subscriptions/${encoded_website}`), null);
+}
 
-export { 
+export {
     doSendSignInLinkToEmail,
     doIsSignInWithEmailLink,
     doSignInWithEmailLink,
     doSignOut,
     doOnAuthStateChanged,
-    getCurrentUser,
-    doSubscribeUserToWebsites,
-    unsubscribeFromWebsite,
+    authUser,
+    user,
+    doSetUserFrequency,
+    doSubscribeUserToWebsite,
+    doUnsubscribeUserFromWebsite,
 }

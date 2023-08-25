@@ -13,18 +13,27 @@ import {
     Spacer,
     CardHeader,
     Divider,
-    Input
+    Input,
+    Spinner
 } from "@nextui-org/react";
 
 import {withAuth} from "@/utils/withAuth"
 
 import {
     doSignOut,
-    getCurrentUser,
-    unsubscribeFromWebsite
+    authUser,
+    user,
+    doSetUserFrequency,
+    doSubscribeUserToWebsite,
+    doUnsubscribeUserFromWebsite,
 } from "@/utils/firebase"
 
-import { useState } from "react";
+import {
+    get,
+    onValue
+} from "firebase/database"
+
+import { useState, useEffect } from "react";
 
 import {FREQUENCY_CHOICES} from "@/utils/constants"
 
@@ -37,142 +46,165 @@ const FAKE_WEBSITES = [
 ]
 
 function App() {
+    const [loading, setLoading] = useState(true)
 
-    const [savedFrequency, setSavedFrequency] = useState("NOT LOADED")
-    const [formFrequency, setFormFrequency] = useState("NEED TO LOAD")
+    const [userFrequency, setUserFrequency] = useState("NOT LOADED")
+    const [formFrequency, setFormFrequency] = useState("NOT LOADED")
 
-    const [websites, setWebsites] = useState(FAKE_WEBSITES)
-    const [websiteToAdd, setWebsiteToAdd] = useState("")
+    const [userWebsites, setUserWebsites] = useState(FAKE_WEBSITES)
+    const [formWebsite, setFormWebsite] = useState("")
 
     const {isOpen: isOpenFrequencyModal, onOpen: onOpenFrequencyModal, onOpenChange: onOpenChangeFrequencyModal} = useDisclosure();
 
     const {isOpen: isOpenAddWebsiteModal, onOpen: onOpenAddWebsiteModal, onOpenChange: onOpenChangeAddWebsiteModal} = useDisclosure();
 
+    // load the user data from firebase
+    useEffect(() => {
+        onValue(user(authUser().uid), (snapshot) => {
+            console.log("onValue called")
+            const data = snapshot.val()
+            if(data){
+                console.log(data.subscriptions)
+                setUserFrequency(data.frequency ? data.frequency : null)
+                setFormFrequency(data.frequency ? data.frequency : null)
+                setUserWebsites(data.subscriptions ? 
+                    Object.keys(data.subscriptions).map((encoded) => encoded.replace(/\%2E/g, '.')) : [])
+                setLoading(false)
+            }
+        })
+    }, [])
+
     return(
         <div className="flex flex-col items-center justify-center">
-            <div className="flex flex-col mt-4 w-1/3 gap-10">
-                <Card>
-                    <CardHeader>
-                        <p className="text-2xl">User Info</p>
-                    </CardHeader>
-                    <Divider/>
-                    <CardBody>
-                        <p>Your email is {getCurrentUser() ? getCurrentUser().email : 'unknown'}.</p>
-                        <p>You're receiving emails <b>{savedFrequency}</b>.</p>
-                        <Spacer y={4}/>
-                        <Button
-                            onClick={doSignOut}
-                        >
-                            Sign Out
-                        </Button>
-                        <Spacer y={4}/>
-                        <Button onPress={onOpenFrequencyModal} color="secondary">Change Email Frequency</Button>
-                        <Modal 
-                            isOpen={isOpenFrequencyModal} 
-                            onOpenChange={onOpenChangeFrequencyModal}
-                            placement="top-center"
-                        >
-                            <ModalContent>
-                            {(onClose) => (
-                                <>
-                                <ModalHeader className="flex flex-col gap-1">Change Frequency of Emails</ModalHeader>
-                                <ModalBody>
-                                    <RadioGroup
-                                        label="How often do you want to receive posts?"
-                                        value={formFrequency}
-                                        orientation="horizontal"
-                                        defaultValue={savedFrequency}
+            {loading ? <Spinner/> : 
+                <div className="flex flex-col mt-4 w-1/3 gap-10">
+                    <Card>
+                        <CardHeader>
+                            <p className="text-2xl">User Info</p>
+                        </CardHeader>
+                        <Divider/>
+                        <CardBody>
+                            <p>Your email is {authUser() ? authUser().email : 'unknown'}.</p>
+                            <p>You're receiving emails <b>{userFrequency}</b>.</p>
+                            <Spacer y={4}/>
+                            <Button
+                                onClick={doSignOut}
+                            >
+                                Sign Out
+                            </Button>
+                            <Spacer y={4}/>
+                            <Button onPress={onOpenFrequencyModal} color="secondary">Change Email Frequency</Button>
+                            <Modal 
+                                isOpen={isOpenFrequencyModal} 
+                                onOpenChange={onOpenChangeFrequencyModal}
+                                placement="top-center"
+                            >
+                                <ModalContent>
+                                {(onClose) => (
+                                    <>
+                                    <ModalHeader className="flex flex-col gap-1">Change Frequency of Emails</ModalHeader>
+                                    <ModalBody>
+                                        <RadioGroup
+                                            label="How often do you want to receive posts?"
+                                            value={userFrequency}
+                                            orientation="horizontal"
+                                            defaultValue={userFrequency}
+                                        >
+                                            <Radio 
+                                                value={FREQUENCY_CHOICES.daily}
+                                                onChange={() => setUserFrequency(FREQUENCY_CHOICES.daily)}
+                                            >
+                                                Daily at 8am
+                                            </Radio>
+                                            <Radio 
+                                                value={FREQUENCY_CHOICES.weekly}
+                                                onChange={() => setUserFrequency(FREQUENCY_CHOICES.weekly)}
+                                            >
+                                                Mondays at 8am
+                                            </Radio>
+                                        </RadioGroup>
+                                    </ModalBody>
+                                    <ModalFooter>
+                                        <Button color="primary" onPress={()=>{
+                                            doSetUserFrequency(authUser().uid, formFrequency)
+                                            setUserFrequency(formFrequency)
+                                            onClose()
+                                        }}>
+                                            Save 
+                                        </Button>
+                                    </ModalFooter>
+                                    </>
+                                )}
+                                </ModalContent>
+                            </Modal>
+                        </CardBody>
+                    </Card>
+                    <Card>
+                        <CardHeader className="justify-between">
+                            <p className="text-2xl self-start">Subscriptions</p>
+                            <Button
+                                color="secondary"
+                                onPress={onOpenAddWebsiteModal}
+                                size="sm"
+                                className="self-end"
+                            >
+                                Add Website
+                            </Button>
+                            <Modal 
+                                isOpen={isOpenAddWebsiteModal} 
+                                onOpenChange={onOpenChangeAddWebsiteModal}
+                                placement="top-center"
+                            >
+                                <ModalContent>
+                                {(onClose) => (
+                                    <>
+                                    <ModalHeader className="flex flex-col gap-1">Add New Website</ModalHeader>
+                                    <ModalBody>
+                                        <Input
+                                            label="Website URL"
+                                            value={formWebsite}
+                                            onChange={e => setFormWebsite(e.target.value)}
+                                        />
+                                    </ModalBody>
+                                    <ModalFooter>
+                                        <Button color="primary" onPress={()=>{
+                                            setUserWebsites([...userWebsites, formWebsite])
+                                            doSubscribeUserToWebsite(authUser().uid, formWebsite).then(() => {
+                                                setFormWebsite("")
+                                                onClose()
+                                            })
+                                        }}>
+                                            Save 
+                                        </Button>
+                                    </ModalFooter>
+                                    </>
+                                )}
+                                </ModalContent>
+                            </Modal>
+                        </CardHeader>
+                        <Divider/>
+                        <CardBody>
+                            {userWebsites ? userWebsites.map(website => (
+                                <div key={website}>
+                                <div className="flex flex-row items-center justify-between">
+                                    <p>{website}</p>
+                                    <Button 
+                                        color="danger" 
+                                        onPress={() => doUnsubscribeUserFromWebsite(authUser().uid, website)}
+                                        size="sm"
                                     >
-                                        <Radio 
-                                            value={FREQUENCY_CHOICES.daily}
-                                            onChange={() => setFormFrequency(FREQUENCY_CHOICES.daily)}
-                                        >
-                                            Daily at 8am
-                                        </Radio>
-                                        <Radio 
-                                            value={FREQUENCY_CHOICES.weekly}
-                                            onChange={() => setFormFrequency(FREQUENCY_CHOICES)}
-                                        >
-                                            Mondays at 8am
-                                        </Radio>
-                                    </RadioGroup>
-                                </ModalBody>
-                                <ModalFooter>
-                                    <Button color="primary" onPress={()=>{
-                                        setSavedFrequency(formFrequency)
-                                        onClose()
-                                    }}>
-                                        Save 
+                                        Unsubscribe
                                     </Button>
-                                </ModalFooter>
-                                </>
-                            )}
-                            </ModalContent>
-                        </Modal>
-                    </CardBody>
-                </Card>
-                <Card>
-                    <CardHeader className="justify-between">
-                        <p className="text-2xl self-start">Subscriptions</p>
-                        <Button
-                            color="secondary"
-                            onPress={onOpenAddWebsiteModal}
-                            size="sm"
-                            className="self-end"
-                        >
-                            Add Website
-                        </Button>
-                        <Modal 
-                            isOpen={isOpenAddWebsiteModal} 
-                            onOpenChange={onOpenChangeAddWebsiteModal}
-                            placement="top-center"
-                        >
-                            <ModalContent>
-                            {(onClose) => (
-                                <>
-                                <ModalHeader className="flex flex-col gap-1">Add New Website</ModalHeader>
-                                <ModalBody>
-                                    <Input
-                                        label="Website URL"
-                                        value={websiteToAdd}
-                                        onChange={e => setWebsiteToAdd(e.target.value)}
-                                    />
-                                </ModalBody>
-                                <ModalFooter>
-                                    <Button color="primary" onPress={()=>{
-                                        setWebsites([...websites, websiteToAdd])
-                                        onClose()
-                                    }}>
-                                        Save 
-                                    </Button>
-                                </ModalFooter>
-                                </>
-                            )}
-                            </ModalContent>
-                        </Modal>
-                    </CardHeader>
-                    <Divider/>
-                    <CardBody>
-                        {websites.map(website => (
-                            <div key={website}>
-                            <div className="flex flex-row items-center justify-between">
-                                <p>{website}</p>
-                                <Button 
-                                    color="danger" 
-                                    onPress={() => unsubscribeFromWebsite(website)}
-                                    size="sm"
-                                >
-                                    Unsubscribe
-                                </Button>
-                            </div>
-                            <Spacer y={2}/>
-                            <Divider/>
-                            <Spacer y={2}/>
-                            </div>
-                        ))}
-                    </CardBody>
-                </Card>
-             </div>
+                                </div>
+                                <Spacer y={2}/>
+                                <Divider/>
+                                <Spacer y={2}/>
+                                </div>
+                            )): null}
+                        </CardBody>
+                    </Card>
+                </div>
+            }
         </div>
     )
 }
