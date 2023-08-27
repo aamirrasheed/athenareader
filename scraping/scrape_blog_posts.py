@@ -7,6 +7,7 @@ from urllib.parse import urlparse, urljoin
 # step 1: Get the website URL
 website_url = sys.argv[1]
 
+
 # step 2: Scrape all links
 hrefs = set()
 def extract_links(url, existing_hrefs, max_depth=10, depth=0):
@@ -71,6 +72,8 @@ for i in range(len(all_links)):
                 {"role": "user", "content": f"{PROMPT} \n \n {included_links_string}"},
             ]
     )
+    
+    
 
     print(response["choices"]["message"]["content"])
 

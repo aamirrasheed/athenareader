@@ -62,7 +62,6 @@ export default function SignUp () {
                         { emailSent ? <h1>Check your email!</h1> :
                             <>
                                 <h1>Sign in!</h1>
-                                <a href="/signup" className="text-blue-500 text-sm">Don't have an account? Sign up</a>
                                 <Spacer y={4}/>
                                 <Input 
                                     isRequired

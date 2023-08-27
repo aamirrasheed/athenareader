@@ -52,9 +52,10 @@ if (!getApps().length) {
     }   
 
 }
-
 // auth functions
-const doSendSignInLinkToEmail = (email, actionCodeSettings) => sendSignInLinkToEmail(firebaseAuth, email, actionCodeSettings);
+const doSendSignInLinkToEmail = (email, actionCodeSettings) => {
+    sendSignInLinkToEmail(firebaseAuth, email, actionCodeSettings);
+}
 
 const doIsSignInWithEmailLink = (emailLink) => isSignInWithEmailLink(firebaseAuth, emailLink);
 
