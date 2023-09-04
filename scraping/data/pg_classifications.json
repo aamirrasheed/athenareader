@@ -1,0 +1,1381 @@
+[
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "yes",
+        "title": "The Roots of Lisp",
+        "date": "-5-2001"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "yes",
+        "title": "What Made Lisp Different",
+        "date": "-12-2001"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Revenge of the Nerds",
+        "date": "-5-2002"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "yes",
+        "title": "If Lisp is So Great",
+        "date": "-5-2003"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Beating the Averages",
+        "date": "-4-2001"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Lisp for Web-Based Applications",
+        "date": "-4-2001"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Lisp History",
+        "date": ""
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Loop and Loop",
+        "date": ""
+    },
+    {
+        "blogpost": "yes",
+        "title": "The Syntax Question",
+        "date": ""
+    },
+    {
+        "blogpost": "yes",
+        "title": "Doug McIlroy: McCarthy Presents Lisp",
+        "date": "-9-2009"
+    },
+    {
+        "blogpost": "yes",
+        "title": "How to Do Great Work",
+        "date": "-7-2023"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "yes",
+        "title": "How to Do Great Work",
+        "date": ""
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "yes",
+        "title": "How to Fund a Startup",
+        "date": "-11-2005"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Are Software Patents Evil?",
+        "date": "-3-2006"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Will Filters Kill Spam?",
+        "date": "-12-2002"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Hackers & Painters",
+        "date": "-2004"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Filters vs. Blacklists",
+        "date": "-9-2002"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "yes",
+        "title": "The Destiny of Blacklists",
+        "date": "-6-2005"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Programming FAQ",
+        "date": "-1-2010"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Writing, Briefly",
+        "date": "-3-2005"
+    },
+    {
+        "blogpost": "yes",
+        "title": "How to Start a Startup",
+        "date": "-3-2005"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "yes",
+        "title": "What You Can't Say",
+        "date": "-1-2004"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "yes",
+        "title": "A New Venture Animal",
+        "date": "-3-2008"
+    },
+    {
+        "blogpost": "yes",
+        "title": "The Equity Equation",
+        "date": "-7-2007"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "yes",
+        "title": "A Word to the Resourceful",
+        "date": "January-2012"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "yes",
+        "title": "How to Do What You Love",
+        "date": "-4-2006"
+    },
+    {
+        "blogpost": "yes",
+        "title": "The Age of the Essay",
+        "date": "-9-2004"
+    },
+    {
+        "blogpost": "yes",
+        "title": "A Student's Guide to Startups",
+        "date": "-10-2006"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Retroactive Copyright",
+        "date": "-3-2006"
+    },
+    {
+        "blogpost": "yes",
+        "title": "A Fundraising Survival Guide",
+        "date": "-8-2008"
+    },
+    {
+        "blogpost": "yes",
+        "title": "On Looking Like Zuckerberg",
+        "date": "-11-2014"
+    },
+    {
+        "blogpost": "yes",
+        "title": "A Local Revolution?",
+        "date": "-4-2009"
+    },
+    {
+        "blogpost": "yes",
+        "title": "The High-Res Society",
+        "date": "-12-2008"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Maybe",
+        "date": "-2-2009"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Why to Move to a Startup Hub",
+        "date": "-10-2007"
+    },
+    {
+        "blogpost": "yes",
+        "title": "A Project of One's Own",
+        "date": "-6-2021"
+    },
+    {
+        "blogpost": "yes",
+        "title": "The Other Half of \"Artists Ship\"",
+        "date": "-11-2008"
+    },
+    {
+        "blogpost": "yes",
+        "title": "How to Get Startup Ideas",
+        "date": "-11-2012"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "yes",
+        "title": "A Way to Detect Bias",
+        "date": "-10-2015"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "yes",
+        "title": "A Firefox in IE's Henhouse",
+        "date": "-9-2004"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "yes",
+        "title": "An Alternative Theory of Unions",
+        "date": "-5-2007"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Apple's Mistake",
+        "date": "-11-2009"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "yes",
+        "title": "After the Ladder",
+        "date": "-8-2005"
+    },
+    {
+        "blogpost": "yes",
+        "title": "An NFT That Saves Lives",
+        "date": "-5-2021"
+    },
+    {
+        "blogpost": "yes",
+        "title": "A Reply to Russell Okung",
+        "date": "-1-2016"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Economic Inequality",
+        "date": "-1-2016"
+    },
+    {
+        "blogpost": "yes",
+        "title": "How to Disagree",
+        "date": "-3-2008"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "yes",
+        "title": "It Works",
+        "date": "12-8-1995"
+    },
+    {
+        "blogpost": "yes",
+        "title": "A Reply to Ezra Klein",
+        "date": "-1-2016"
+    },
+    {
+        "blogpost": "yes",
+        "title": "What You (Want to)* Want",
+        "date": "-11-2022"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "yes",
+        "title": "What I Didn't Say",
+        "date": "-12-2013"
+    },
+    {
+        "blogpost": "yes",
+        "title": "How to Do What You Love",
+        "date": "-1-2006"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Founders' Accents",
+        "date": "-8-2013"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Black Swan Farming",
+        "date": "-9-2012"
+    },
+    {
+        "blogpost": "yes",
+        "title": "The Founder Visa",
+        "date": "-4-2009"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Female Founders",
+        "date": "-1-2014"
+    },
+    {
+        "blogpost": "yes",
+        "title": "The Need to Read",
+        "date": "-11-2022"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Putting Ideas into Words",
+        "date": "-2-2022"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Help Us",
+        "date": ""
+    },
+    {
+        "blogpost": "yes",
+        "title": "The Hundred-Year Language",
+        "date": "-4-2003"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Some Work on Arc",
+        "date": "-10-2003"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "yes",
+        "title": "First Priority: Core Language",
+        "date": "-2-2008"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Design Philosophy",
+        "date": "-9-2001"
+    },
+    {
+        "blogpost": "yes",
+        "title": "The Arc Challenge",
+        "date": "-2-2008"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "yes",
+        "title": "So Far, So Good",
+        "date": "-8-2003"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Stopping Spam",
+        "date": "-8-2003"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Better Bayesian Filtering",
+        "date": "-01-2003"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Spam is Different",
+        "date": "-8-2002"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Raph Levien Re: Spam is Different",
+        "date": "-8-2002"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Return of the Mac",
+        "date": "-3-2005"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Trevor with Powerbooks",
+        "date": "-3-2005"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Bel",
+        "date": "-10-2019"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Alien Truth",
+        "date": "-10-2022"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Beyond Smart",
+        "date": "-10-2021"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Novelty and Heresy",
+        "date": "-11-2019"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "yes",
+        "title": "How to Work Hard",
+        "date": "-6-2021"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Frighteningly Ambitious Startup Ideas",
+        "date": "-3-2012"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Is There Such a Thing as Good Taste?",
+        "date": "-11-2021"
+    },
+    {
+        "blogpost": "yes",
+        "title": "The Fatal Pinch",
+        "date": "-12-2014"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Being a Noob",
+        "date": "-1-2020"
+    },
+    {
+        "blogpost": "yes",
+        "title": "The Hardware Renaissance",
+        "date": "-10-2012"
+    },
+    {
+        "blogpost": "yes",
+        "title": "What Microsoft Is this the Altair Basic of?",
+        "date": "-2-2015"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Charisma / Power",
+        "date": "January 2017"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Six Principles for Making New Things",
+        "date": "-2-2008"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Keep Your Identity Small",
+        "date": "-2-2009"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Divergence",
+        "date": "-12-2008"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Undergraduation",
+        "date": "-3-2005"
+    },
+    {
+        "blogpost": "yes",
+        "title": "More Advice for Undergrads",
+        "date": ""
+    },
+    {
+        "blogpost": "yes",
+        "title": "This Year We Can End the Death Penalty in California",
+        "date": "-11-2016"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Copy What You Like",
+        "date": "-7-2006"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Trolls",
+        "date": "-2-2008"
+    },
+    {
+        "blogpost": "yes",
+        "title": "How to Think for Yourself",
+        "date": "-11-2020"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Good and Bad Procrastination",
+        "date": "-12-2005"
+    },
+    {
+        "blogpost": "yes",
+        "title": "You and Your Research",
+        "date": "-3-1986"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Orthodox Privilege",
+        "date": "-7-2020"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Microsoft is Dead",
+        "date": "-4-2007"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Haters",
+        "date": "-1-2020"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Holding a Program in One's Head",
+        "date": "-8-2007"
+    },
+    {
+        "blogpost": "yes",
+        "title": "What does \"Web 2.0\" mean?",
+        "date": "-11-2005"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Interview About Web 2.0",
+        "date": "-7-2006"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Crazy New Ideas",
+        "date": "-5-2021"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "yes",
+        "title": "News from the Front",
+        "date": "-9-2007"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Jessica Livingston",
+        "date": "-11-2015"
+    },
+    {
+        "blogpost": "yes",
+        "title": "The Hacker's Guide to Investors",
+        "date": "-4-2007"
+    },
+    {
+        "blogpost": "yes",
+        "title": "What Business Can Learn from Open Source",
+        "date": "-8-2005"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Earnestness",
+        "date": "-12-2020"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Mind the Gap",
+        "date": "-5-2004"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Maker's Schedule, Manager's Schedule",
+        "date": "-7-2009"
+    },
+    {
+        "blogpost": "yes",
+        "title": "The Future of Startup Funding",
+        "date": "-8-2010"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Hackers and Painters",
+        "date": "-5-2003"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "yes",
+        "title": "The Real Reason to End the Death Penalty",
+        "date": "-4-2021"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Mean People Fail",
+        "date": "-11-2014"
+    },
+    {
+        "blogpost": "yes",
+        "title": "What I've Learned from Hacker News",
+        "date": "-2-2009"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Ramen Profitable",
+        "date": "-7-2009"
+    },
+    {
+        "blogpost": "yes",
+        "title": "How Y Combinator Started",
+        "date": "-3-2012"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Summer Founders Program",
+        "date": "-3-2005"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Two Kinds of Judgement",
+        "date": "-4-2007"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Why It's Safe for Founders to Be Nice",
+        "date": "-8-2015"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Default Alive or Default Dead?",
+        "date": "-10-2015"
+    },
+    {
+        "blogpost": "yes",
+        "title": " Writing and Speaking",
+        "date": "-3-2012"
+    },
+    {
+        "blogpost": "yes",
+        "title": "The Hardest Lessons for Startups to Learn",
+        "date": "-4-2006"
+    },
+    {
+        "blogpost": "yes",
+        "title": "The Risk of Discovery",
+        "date": "-1-2017"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Disconnecting Distraction",
+        "date": "-5-2008"
+    },
+    {
+        "blogpost": "yes",
+        "title": "How to Make Pittsburgh a Startup Hub",
+        "date": "-4-2016"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Learning from Founders",
+        "date": "-01-2007"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Why to Not Not Start a Startup",
+        "date": "-3-2007"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Persuade xor Discover",
+        "date": "-9-2009"
+    },
+    {
+        "blogpost": "yes",
+        "title": "How Not to Die",
+        "date": "-8-2007"
+    },
+    {
+        "blogpost": "yes",
+        "title": "How People Get Rich Now",
+        "date": "-4-2021"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Why There Aren't More Googles",
+        "date": "-4-2008"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Java's Cover",
+        "date": "-4-2001"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Trevor Re: Java's Cover",
+        "date": ""
+    },
+    {
+        "blogpost": "yes",
+        "title": "Berners-Lee Re: Java",
+        "date": "-1996"
+    },
+    {
+        "blogpost": "yes",
+        "title": "The Python Paradox",
+        "date": "-8-2004"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Bradley's Ghost",
+        "date": "-11-2004"
+    },
+    {
+        "blogpost": "yes",
+        "title": "The Airbnbs",
+        "date": "-12-2020"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Investor Herd Dynamics",
+        "date": "-8-2013"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "yes",
+        "title": "The List of N Things",
+        "date": "-9-2009"
+    },
+    {
+        "blogpost": "yes",
+        "title": "What I Did this Summer",
+        "date": "-10-2005"
+    },
+    {
+        "blogpost": "yes",
+        "title": "How Art Can Be Good",
+        "date": "-12-2006"
+    },
+    {
+        "blogpost": "yes",
+        "title": "What Startups Are Really Like",
+        "date": "-10-2009"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Is It Worth Being Wise?",
+        "date": "-2-2007"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Lies We Tell Kids",
+        "date": "-5-2008"
+    },
+    {
+        "blogpost": "yes",
+        "title": "How to Raise Money",
+        "date": "-9-2013"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Before the Startup",
+        "date": "-10-2014"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Let the Other 95% of Great Programmers In",
+        "date": "-12-2014"
+    },
+    {
+        "blogpost": "yes",
+        "title": "It's Charisma, Stupid",
+        "date": "-11-2004"
+    },
+    {
+        "blogpost": "yes",
+        "title": "What Charisma Is",
+        "date": "-11-2004"
+    },
+    {
+        "blogpost": "yes",
+        "title": "What Doesn't Seem Like Work?",
+        "date": "-1-2015"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Modeling a Wealth Tax",
+        "date": "-8-2020"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Startups in 13 Sentences",
+        "date": "-2-2009"
+    },
+    {
+        "blogpost": "yes",
+        "title": "How to Convince Investors",
+        "date": "-8-2013"
+    },
+    {
+        "blogpost": "yes",
+        "title": "The Four Quadrants of Conformism",
+        "date": "-7-2020"
+    },
+    {
+        "blogpost": "yes",
+        "title": "What I've Learned from Users",
+        "date": "-9-2022"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Startup Investing Trends",
+        "date": "-6-2013"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Fierce Nerds",
+        "date": "-5-2021"
+    },
+    {
+        "blogpost": "yes",
+        "title": "The Submarine",
+        "date": "-4-2005"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Coronavirus and Credibility",
+        "date": "-4-2020"
+    },
+    {
+        "blogpost": "yes",
+        "title": "What the Bubble Got Right",
+        "date": "-9-2004"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "yes",
+        "title": "How to Lose Time and Money",
+        "date": "-7-2010"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Life is Short",
+        "date": "January 2016"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Write Like You Talk",
+        "date": "-10-2015"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Why Twitter is a Big Deal",
+        "date": "-4-2009"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Write Simply",
+        "date": "-3-2021"
+    },
+    {
+        "blogpost": "yes",
+        "title": "The Ronco Principle",
+        "date": "-1-2015"
+    },
+    {
+        "blogpost": "yes",
+        "title": "The Pooled-Risk Company Management Company",
+        "date": "-7-2008"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Defining Property",
+        "date": "-3-2012"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Change Your Name",
+        "date": "-8-2015"
+    },
+    {
+        "blogpost": "yes",
+        "title": "How You Know",
+        "date": "-12-2014"
+    },
+    {
+        "blogpost": "yes",
+        "title": "The Top Idea in Your Mind",
+        "date": "-7-2010"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Why YC",
+        "date": "-3-2006"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Why to Start a Startup in a Bad Economy",
+        "date": "-10-2008"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Organic Startup Ideas",
+        "date": "-4-2010"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Why Smart People Have Bad Ideas",
+        "date": "-4-2005"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "yes",
+        "title": "General and Surprising",
+        "date": "-9-2017"
+    },
+    {
+        "blogpost": "yes",
+        "title": "The New Funding Landscape",
+        "date": "-10-2010"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Weird Languages",
+        "date": "-8-2021"
+    },
+    {
+        "blogpost": "yes",
+        "title": "The Island Test",
+        "date": "-7-2006"
+    },
+    {
+        "blogpost": "yes",
+        "title": "The Acceleration of Addictiveness",
+        "date": "-7-2010"
+    },
+    {
+        "blogpost": "yes",
+        "title": "The Two Kinds of Moderate",
+        "date": "-12-2019"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Why TV Lost",
+        "date": "-3-2009"
+    },
+    {
+        "blogpost": "yes",
+        "title": "How to Write Usefully",
+        "date": "-2-2020"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Be Good",
+        "date": "-4-2008"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Post-Medium Publishing",
+        "date": "-9-2009"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Billionaires Build",
+        "date": "-12-2020"
+    },
+    {
+        "blogpost": "yes",
+        "title": "The Lesson to Unlearn",
+        "date": "-12-2019"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Don't Talk to Corp Dev",
+        "date": "-1-2015"
+    },
+    {
+        "blogpost": "yes",
+        "title": "The Patent Pledge",
+        "date": "-8-2011"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Tablets",
+        "date": "-12-2010"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Having Kids",
+        "date": "-12-2019"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Heresy",
+        "date": "-4-2022"
+    },
+    {
+        "blogpost": "yes",
+        "title": "The Trouble with the Segway",
+        "date": "-7-2009"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Do Things that Don't Scale",
+        "date": "-7-2013"
+    },
+    {
+        "blogpost": "yes",
+        "title": "The Bus Ticket Theory of Genius",
+        "date": "-11-2019"
+    },
+    {
+        "blogpost": "yes",
+        "title": "What Happened to Yahoo",
+        "date": "-8-2010"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Snapshot: Viaweb, June 1998",
+        "date": "-6-1998"
+    },
+    {
+        "blogpost": "no"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Restricted Donations",
+        "date": "-3-2021"
+    },
+    {
+        "blogpost": "yes",
+        "title": "What We Look for in Founders",
+        "date": "-10-2010"
+    },
+    {
+        "blogpost": "yes",
+        "title": "The Top of My Todo List",
+        "date": "-4-2012"
+    },
+    {
+        "blogpost": "yes",
+        "title": "High Resolution Fundraising",
+        "date": "-9-2010"
+    },
+    {
+        "blogpost": "yes",
+        "title": "The 18 Mistakes That Kill Startups",
+        "date": "-10-2006"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Why Startups Condense in America",
+        "date": "-5-2006"
+    },
+    {
+        "blogpost": "yes",
+        "title": "How to Present to Investors",
+        "date": "-8-2006"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Early Work",
+        "date": "-10-2020"
+    },
+    {
+        "blogpost": "yes",
+        "title": "How to Be an Expert in a Changing World",
+        "date": "-12-2014"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Why Startup Hubs Work",
+        "date": "-10-2011"
+    },
+    {
+        "blogpost": "yes",
+        "title": "You Weren't Meant to Have a Boss",
+        "date": "-3-2008"
+    },
+    {
+        "blogpost": "yes",
+        "title": "How to Get New Ideas",
+        "date": "-1-2023"
+    },
+    {
+        "blogpost": "yes",
+        "title": "Randomness",
+        "date": "-4-2006"
+    },
+    {
+        "blogpost": "yes",
+        "title": "What Kate Saw in Silicon Valley",
+        "date": "-8-2009"
+    },
+    {
+        "blogpost": "yes",
+        "title": "What I Worked On",
+        "date": "-2-2021"
+    }
+]

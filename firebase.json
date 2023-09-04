@@ -12,8 +12,8 @@
   },
   "functions": [
     {
-      "source": "functions",
-      "codebase": "default",
+      "source": "functions-js",
+      "codebase": "functions-js",
       "ignore": [
         "node_modules",
         ".git",
@@ -22,6 +22,16 @@
       ],
       "predeploy": [
         "npm --prefix \"$RESOURCE_DIR\" run lint"
+      ]
+    },
+    {
+      "source": "functions-py",
+      "codebase": "functions-py",
+      "ignore": [
+        "venv",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log"
       ]
     }
   ],
@@ -37,6 +47,9 @@
     },
     "hosting": {
       "port": 5000
+    },
+    "pubsub": {
+      "port": 8085
     },
     "ui": {
       "enabled": true

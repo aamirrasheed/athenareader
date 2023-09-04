@@ -18,6 +18,11 @@ import {
 } from "@nextui-org/react";
 
 import {withAuth} from "@/utils/withAuth"
+import {
+    encodeWebsiteURL,
+    decodeWebsiteURL,
+    extractSchemeAndHost
+} from "@/utils/websiteNameConversion"
 
 import {
     doSignOut,
@@ -53,22 +58,42 @@ function App() {
 
     const [userWebsites, setUserWebsites] = useState(FAKE_WEBSITES)
     const [formWebsite, setFormWebsite] = useState("")
+    const [formWebsiteError, setFormWebsiteError] = useState(null)
+    const [formWebsiteLoading, setFormWebsiteLoading] = useState(false)
 
     const {isOpen: isOpenFrequencyModal, onOpen: onOpenFrequencyModal, onOpenChange: onOpenChangeFrequencyModal} = useDisclosure();
 
     const {isOpen: isOpenAddWebsiteModal, onOpen: onOpenAddWebsiteModal, onOpenChange: onOpenChangeAddWebsiteModal} = useDisclosure();
 
+    const handleFormWebsiteSubmit = (onClose) => {
+        setFormWebsiteLoading(true)
+        if(userWebsites.includes(formWebsite)) {
+            setFormWebsiteError("Website already exists")
+        } else {
+        
+            doSubscribeUserToWebsite(formWebsite)
+            .then(() => {
+                setFormWebsite("")
+                onClose()
+            })
+            .catch((error) => {
+                setFormWebsiteError(error.message)
+            })
+            .finally(() => {
+                setFormWebsiteLoading(false)
+            })
+        }
+    }
+    
     // load the user data from firebase
     useEffect(() => {
         onValue(user(authUser().uid), (snapshot) => {
-            console.log("onValue called")
             const data = snapshot.val()
             if(data){
-                console.log(data.subscriptions)
                 setUserFrequency(data.frequency ? data.frequency : null)
                 setFormFrequency(data.frequency ? data.frequency : null)
                 setUserWebsites(data.subscriptions ? 
-                    Object.keys(data.subscriptions).map((encoded) => encoded.replace(/\%2E/g, '.')) : [])
+                    Object.keys(data.subscriptions).map((encoded) => decodeWebsiteURL(encoded)) : [])
                 setLoading(false)
             }
         })
@@ -163,18 +188,22 @@ function App() {
                                         <Input
                                             label="Website URL"
                                             value={formWebsite}
-                                            onChange={e => setFormWebsite(e.target.value)}
+                                            errorMessage={formWebsiteError}
+                                            disabled={formWebsiteLoading}
+                                            onChange={e => {
+                                                setFormWebsite(e.target.value)
+                                                setFormWebsiteError(null)
+                                            }}
+                                            onKeyDown={e => e.key === 'Enter' ? handleFormWebsiteSubmit(onClose): null}
                                         />
                                     </ModalBody>
                                     <ModalFooter>
-                                        <Button color="primary" onPress={()=>{
-                                            setUserWebsites([...userWebsites, formWebsite])
-                                            doSubscribeUserToWebsite(authUser().uid, formWebsite).then(() => {
-                                                setFormWebsite("")
-                                                onClose()
-                                            })
-                                        }}>
-                                            Save 
+                                        <Button 
+                                            color="primary" 
+                                            onPress={(e) => handleFormWebsiteSubmit(onClose)}
+                                            isLoading={formWebsiteLoading}
+                                        >
+                                            {formWebsiteLoading ? "" : "Save"}
                                         </Button>
                                     </ModalFooter>
                                     </>

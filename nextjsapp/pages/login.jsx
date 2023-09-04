@@ -72,6 +72,11 @@ export default function SignUp () {
                                         if (validator.isEmail(e.target.value)) setFormErrors({...formData, email: ""})
                                         else setFormErrors({...formData, email: EMAIL_ERROR_MSG})
                                     }}
+                                    onKeyDown={e => {
+                                        if (e.key === 'Enter') {
+                                            handleSubmit(e);
+                                        }
+                                    }}
                                     validationState={formErrors.email === "" ? "valid" : "invalid"}
                                     errorMessage={formErrors.email}
                                 />

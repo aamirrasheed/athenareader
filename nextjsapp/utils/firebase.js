@@ -1,7 +1,10 @@
+import https from 'https';
+import http from 'http';
 import {
     initializeApp,
     getApps
 } from 'firebase/app';
+
 import {
     getAuth,
     setPersistence,
@@ -13,12 +16,23 @@ import {
     signOut,
     connectAuthEmulator,
 } from 'firebase/auth';
+
 import { 
     getDatabase, 
     connectDatabaseEmulator,
     ref,
     set,
 } from "firebase/database";
+
+import {
+    getFunctions,
+    httpsCallable,
+    connectFunctionsEmulator
+} from "firebase/functions";
+
+import {
+    extractSchemeAndHost
+} from './websiteNameConversion';
 
 const firebaseConfig = {
   apiKey: "AIzaSyAhEQFLIgWUrs_lsxQEZcHnzq6IWCPTy7w",
@@ -33,7 +47,7 @@ const firebaseConfig = {
 
 let firebaseAuth;
 let firebaseDb;
-
+let firebaseFunctions;
 
 if (!getApps().length) {
     const firebaseApp = initializeApp(firebaseConfig);
@@ -45,6 +59,9 @@ if (!getApps().length) {
     // initialize realtime database
     firebaseDb = getDatabase(firebaseApp)
 
+    firebaseFunctions = getFunctions(firebaseApp);
+    connectFunctionsEmulator(firebaseFunctions, "127.0.0.1", 5001);
+
     // connect to firebase emulators while developing
     if (process.env.NODE_ENV === 'development') {
         connectAuthEmulator(firebaseAuth, 'http://127.0.0.1:9099');
@@ -54,7 +71,7 @@ if (!getApps().length) {
 }
 // auth functions
 const doSendSignInLinkToEmail = (email, actionCodeSettings) => {
-    sendSignInLinkToEmail(firebaseAuth, email, actionCodeSettings);
+    return sendSignInLinkToEmail(firebaseAuth, email, actionCodeSettings);
 }
 
 const doIsSignInWithEmailLink = (emailLink) => isSignInWithEmailLink(firebaseAuth, emailLink);
@@ -71,11 +88,19 @@ const user = uid => ref(firebaseDb, `users/${uid}`);
 
 function doSetUserFrequency(uid, frequency) { set(ref(firebaseDb, `users/${uid}/frequency`), frequency);}
 
-const doSubscribeUserToWebsite = (uid, website) => {
-    let url = new URL(website.includes('://') ? website : 'http://' + website);
-    let encoded_website = url.hostname.replace(/\./g, '%2E');
-    
-    return set(ref(firebaseDb, `users/${uid}/subscriptions/${encoded_website}`), true)
+// TODO: uid not needed
+const doSubscribeUserToWebsite = (url) => {
+    console.log("doSubscribeUserToWebsite called with website", url)
+
+    const addSubscription = httpsCallable(firebaseFunctions, 'addSubscription');
+    return addSubscription({website: url})
+    .then((result) => {
+        const data = result.data;
+        console.log("Returned response from addSubscription: ", data);
+    })
+
+    // let encoded_website = url.hostname.replace(/\./g, '%2E');
+    // return set(ref(firebaseDb, `users/${uid}/subscriptions/${encoded_website}`), true)
 }
 
 const doUnsubscribeUserFromWebsite = (uid, website) => {
