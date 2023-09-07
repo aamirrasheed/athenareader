@@ -1,0 +1,2 @@
+gcloud functions deploy extractPosts --gen2 --runtime=python311 --region=us-central1 --source=. \
+--entry-point=extractPosts --trigger-http --allow-unauthenticated --timeout 180 --set-env-vars OPENAI_API_KEY=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

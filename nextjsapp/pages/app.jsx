@@ -18,10 +18,9 @@ import {
 } from "@nextui-org/react";
 
 import {withAuth} from "@/utils/withAuth"
+
 import {
-    encodeWebsiteURL,
-    decodeWebsiteURL,
-    extractSchemeAndHost
+    decodeUrl
 } from "@/utils/websiteNameConversion"
 
 import {
@@ -42,24 +41,18 @@ import { useState, useEffect } from "react";
 
 import {FREQUENCY_CHOICES} from "@/utils/constants"
 
-const FAKE_WEBSITES = [
-    "paulgraham.com",
-    "blog.samaltman.com",
-    "markmanson.com",
-    "waitbutwhy.com",
-    "aamirrasheed.substack.com"
-]
-
 function App() {
     const [loading, setLoading] = useState(true)
 
     const [userFrequency, setUserFrequency] = useState("NOT LOADED")
     const [formFrequency, setFormFrequency] = useState("NOT LOADED")
 
-    const [userWebsites, setUserWebsites] = useState(FAKE_WEBSITES)
+    const [userWebsites, setUserWebsites] = useState([])
     const [formWebsite, setFormWebsite] = useState("")
     const [formWebsiteError, setFormWebsiteError] = useState(null)
     const [formWebsiteLoading, setFormWebsiteLoading] = useState(false)
+
+    const [unsubscribeLoading, setUnsubscribeLoading] = useState(false)
 
     const {isOpen: isOpenFrequencyModal, onOpen: onOpenFrequencyModal, onOpenChange: onOpenChangeFrequencyModal} = useDisclosure();
 
@@ -93,7 +86,7 @@ function App() {
                 setUserFrequency(data.frequency ? data.frequency : null)
                 setFormFrequency(data.frequency ? data.frequency : null)
                 setUserWebsites(data.subscriptions ? 
-                    Object.keys(data.subscriptions).map((encoded) => decodeWebsiteURL(encoded)) : [])
+                    Object.keys(data.subscriptions).map((encoded) => decodeUrl(encoded)) : [])
                 setLoading(false)
             }
         })
@@ -110,7 +103,6 @@ function App() {
                         <Divider/>
                         <CardBody>
                             <p>Your email is {authUser() ? authUser().email : 'unknown'}.</p>
-                            <p>You're receiving emails <b>{userFrequency}</b>.</p>
                             <Spacer y={4}/>
                             <Button
                                 onClick={doSignOut}
@@ -186,6 +178,7 @@ function App() {
                                     <ModalHeader className="flex flex-col gap-1">Add New Website</ModalHeader>
                                     <ModalBody>
                                         <Input
+                                            autoFocus
                                             label="Website URL"
                                             value={formWebsite}
                                             errorMessage={formWebsiteError}
@@ -217,12 +210,21 @@ function App() {
                                 <div key={website}>
                                 <div className="flex flex-row items-center justify-between">
                                     <p>{website}</p>
-                                    <Button 
+                                    <Button
+                                        name={website}
                                         color="danger" 
-                                        onPress={() => doUnsubscribeUserFromWebsite(authUser().uid, website)}
+                                        onClick={(e) => {
+                                            setUnsubscribeLoading(true)
+                                            doUnsubscribeUserFromWebsite(website).then(() => {
+                                                setUnsubscribeLoading(false)
+                                            })
+                                                setUserWebsites(userWebsites.filter(item => item !== website))
+                                            
+                                        }}
+                                        isLoading={unsubscribeLoading}
                                         size="sm"
                                     >
-                                        Unsubscribe
+                                        {unsubscribeLoading? "": "Unsubscribe"}
                                     </Button>
                                 </div>
                                 <Spacer y={2}/>

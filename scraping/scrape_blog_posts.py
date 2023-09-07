@@ -11,14 +11,8 @@ from concurrent.futures import ThreadPoolExecutor, TimeoutError
 
 def scrape_website(website_url):
     posts = {}
-    num_recursive_calls = 0
     def extract_links(url, existing_hrefs=set(), max_depth=4, depth=0):
-        nonlocal num_recursive_calls # this is a hack to get around the fact that python doesn't have nonlocal variables
-        num_recursive_calls += 1
         
-
-        # print("Scraping", url)
-
         base_url = urlparse(url).scheme + "://" + urlparse(url).netloc
         response = requests.get(url)
         
@@ -31,7 +25,6 @@ def scrape_website(website_url):
             posts[url] = soup.get_text()
 
             if(depth == max_depth):
-                print("Max depth reached on ", url)
                 return existing_hrefs
 
             # TODO: Add post classification, title extraction, and date extraction here
@@ -48,11 +41,9 @@ def scrape_website(website_url):
                 if urlparse(absolute_url).netloc == urlparse(url).netloc:
                     found_hrefs.add(absolute_url)
             
-            # print("Found", len(found_hrefs), "links")
 
             # determine which links are new from this page
             new_hrefs = found_hrefs.difference(existing_hrefs)
-            # print("Of these, ", len(new_hrefs), "are new:", new_hrefs)
 
             # if there are new links, explore them to determine if more links exist
             if len(new_hrefs) > 0:
@@ -74,7 +65,7 @@ def scrape_website(website_url):
         # return all the links we found
         return existing_hrefs
 
-    return posts, extract_links(website_url, max_depth=7), num_recursive_calls 
+    return posts, extract_links(website_url, max_depth=7) 
 
 def write_posts_to_disk(filename, posts):
     with open(f'./data/{filename}.json', 'w') as fp:
@@ -109,17 +100,14 @@ def extract_page_classification(url, body):
 if __name__ == "__main__":
     website_url = sys.argv[1]
     
-    print("Scraping website...")
-    pages, all_links, num_recursive_calls = scrape_website(website_url)
-    print(f"Finished scraping website. {len(all_links)} links found, {len(pages)} pages saved, and {num_recursive_calls} recursive calls.")
+    # step 1 - scrape website
+    posts, all_links = scrape_website(website_url)
 
 
+    # # write posts to disk   
+    # filename = urlparse(website_url).netloc.replace('/', '_').replace(':', '_').replace('.', '_')
+    # write_posts_to_disk(filename, pages)
 
-    # write posts to disk   
-    filename = urlparse(website_url).netloc.replace('/', '_').replace(':', '_').replace('.', '_')
-    write_posts_to_disk(filename, pages)
-
-    quit()
 
     # extract page classification
     classifications = []

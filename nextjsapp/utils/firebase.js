@@ -1,5 +1,3 @@
-import https from 'https';
-import http from 'http';
 import {
     initializeApp,
     getApps
@@ -30,10 +28,6 @@ import {
     connectFunctionsEmulator
 } from "firebase/functions";
 
-import {
-    extractSchemeAndHost
-} from './websiteNameConversion';
-
 const firebaseConfig = {
   apiKey: "AIzaSyAhEQFLIgWUrs_lsxQEZcHnzq6IWCPTy7w",
   authDomain: "sendittomyemail-4c3ca.firebaseapp.com",
@@ -60,12 +54,12 @@ if (!getApps().length) {
     firebaseDb = getDatabase(firebaseApp)
 
     firebaseFunctions = getFunctions(firebaseApp);
-    connectFunctionsEmulator(firebaseFunctions, "127.0.0.1", 5001);
 
     // connect to firebase emulators while developing
     if (process.env.NODE_ENV === 'development') {
         connectAuthEmulator(firebaseAuth, 'http://127.0.0.1:9099');
         connectDatabaseEmulator(firebaseDb, '127.0.0.1', '9000');
+        connectFunctionsEmulator(firebaseFunctions, "127.0.0.1", 5001);
     }   
 
 }
@@ -88,7 +82,6 @@ const user = uid => ref(firebaseDb, `users/${uid}`);
 
 function doSetUserFrequency(uid, frequency) { set(ref(firebaseDb, `users/${uid}/frequency`), frequency);}
 
-// TODO: uid not needed
 const doSubscribeUserToWebsite = (url) => {
     console.log("doSubscribeUserToWebsite called with website", url)
 
@@ -98,15 +91,17 @@ const doSubscribeUserToWebsite = (url) => {
         const data = result.data;
         console.log("Returned response from addSubscription: ", data);
     })
-
-    // let encoded_website = url.hostname.replace(/\./g, '%2E');
-    // return set(ref(firebaseDb, `users/${uid}/subscriptions/${encoded_website}`), true)
 }
 
-const doUnsubscribeUserFromWebsite = (uid, website) => {
-    let url = new URL(website.includes('://') ? website : 'http://' + website);
-    let encoded_website = url.hostname.replace(/\./g, '%2E');
-    return set(ref(firebaseDb, `users/${uid}/subscriptions/${encoded_website}`), null);
+const doUnsubscribeUserFromWebsite = (url) => {
+    console.log("doUnsubscribeUserFromWebsite")
+
+    const deleteSubscription = httpsCallable(firebaseFunctions, 'deleteSubscription');
+    return deleteSubscription({website: url})
+    .then((result) => {
+        const data = result.data;
+        console.log("Returned response from deleteSubscription: ", data);
+    })
 }
 
 export {
