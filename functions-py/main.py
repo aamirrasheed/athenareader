@@ -1,5 +1,8 @@
 from concurrent.futures import ThreadPoolExecutor, TimeoutError
 import time
+from urllib.parse import urlparse, urljoin
+import requests
+from bs4 import BeautifulSoup
 
 from firebase_admin import db
 from firebase_admin import initialize_app
@@ -18,23 +21,13 @@ def extractPagesFromWebsite(req):
     A GET request that contains a blog url to scrape
     
     Output:
-    1. Realtime Database contains an entry under /websites with the following structure:
-        - websites
-            - website-urls
-                - date-last-scraped
-                - unprocessed-page-urls
-                    - url
-                    - body
-                - posts
-                    - post-urls 
-    2. Realtime Database contains entries under /posts with the following structure:
-        - posts
-            - post-urls
-                - title
-                - date
+    Realtime Database contains an entry under /websites with the following structure:
+    - websites
+        - website-urls
+            - date-last-scraped
+            - unprocessed-page-urls
+                - url
                 - body
-                - summary
-                - date-last-scraped
     
     '''
     # Step 1: get the website URL
@@ -45,21 +38,84 @@ def extractPagesFromWebsite(req):
         raise Exception("No website url provided")
     
     print("scrapeWebsite triggered with url:", decoded_website_url)
-    
-    # Step 2: Scrape the posts from the website
-    pages, all_links = extract_posts.scrape_website(decoded_website_url)
 
-    print("Found", len(pages), "pages")
-
-    # Step 3: Record metadata to /websites
+    # Step 2: Write initial entry to /websites
     ref = db.reference('/')
     website_ref = ref.child('websites').child(encoded_website_url)
     website_ref.child('date-added').set(time.time())
+    
+    # Step 3: Define recursive function to scrape website
+    def scrape_website(website_url, depth_to_scrape=2):
+        num_pages = 0
 
-    # Step 4: Save pages to /websites/url/unprocessed-page-urls for later processing
-    for page_url in pages:
-        encoded_page_url = extract_posts.encode_url(page_url)
-        website_ref.child('unprocessed-page-urls').child(encoded_page_url).child("body").set(pages[page_url])
+        print("Scraping", website_url, "with depth", depth_to_scrape, "...")
+        
+        def extract_links(url, existing_hrefs=set(), max_depth=4, depth=0):
+            
+            base_url = urlparse(url).scheme + "://" + urlparse(url).netloc
+            response = requests.get(url)
+            
+            if response.status_code == 200:
+                # valid url, add to existing_hrefs
+                existing_hrefs.add(url)
+
+                # get page content and save to posts for classification later on
+                soup = BeautifulSoup(response.content, 'html.parser')
+                website_text = soup.get_text()
+
+                # write to /websites
+                encoded_page_url = extract_posts.encode_url(url)
+                website_ref.child('unprocessed-page-urls').child(encoded_page_url).child("body").set(website_text)
+                nonlocal num_pages
+                num_pages += 1
+                # if max_depth reached, pop outta here
+                if(depth == max_depth):
+                    return existing_hrefs
+
+                # get links inside the page soup for further recursive madness
+                found_hrefs = set()
+                for element in soup.find_all(href=True):
+                    href_value = element['href']
+                    
+                    # if href_value is relative, make it absolute. If it's an external link, it will be unchanged
+                    absolute_url = urljoin(base_url, href_value)
+
+                    # don't recurse on external links - must match domain
+                    if urlparse(absolute_url).netloc == urlparse(url).netloc:
+                        found_hrefs.add(absolute_url)
+                
+
+                # determine which links are new
+                new_hrefs = found_hrefs.difference(existing_hrefs)
+
+                # if there are new links, explore them to determine if more links exist
+                if len(new_hrefs) > 0:
+
+                    # update existing_hrefs with new_hrefs so we don't explore new_hrefs in any subsequent recursive calls
+                    existing_hrefs = existing_hrefs.union(new_hrefs)
+
+                    # for each link in new_hrefs, let's recurisvely explore it to see if there are more pages to find
+                    for href in new_hrefs:
+                        new_existing_hrefs = extract_links(href, existing_hrefs, max_depth, depth + 1)
+
+                        # add any new links found in the recursive call to the existing_hrefs set
+                        existing_hrefs = existing_hrefs.union(new_existing_hrefs)
+                    
+            else:
+                # Invalid URL, so remove the URL from the list of links to scrape
+                existing_hrefs.remove(url)
+            
+            # return all the links we found
+            return existing_hrefs
+
+        return extract_links(website_url, max_depth=depth_to_scrape), num_pages
+
+    # Step 4: Scrape the posts from the website
+    all_links, num_pages = scrape_website(decoded_website_url)
+
+    print("Saved", len(all_links), "links")
+    print("Found", num_pages, "pages")
+
     
     return "Success"
     

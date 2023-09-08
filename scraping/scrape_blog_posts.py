@@ -8,6 +8,8 @@ import json
 import prompts
 import time
 from concurrent.futures import ThreadPoolExecutor, TimeoutError
+import os
+import psutil
 
 def scrape_website(website_url):
     posts = {}
@@ -65,7 +67,7 @@ def scrape_website(website_url):
         # return all the links we found
         return existing_hrefs
 
-    return posts, extract_links(website_url, max_depth=7) 
+    return posts, extract_links(website_url, max_depth=4) 
 
 def write_posts_to_disk(filename, posts):
     with open(f'./data/{filename}.json', 'w') as fp:
@@ -101,7 +103,9 @@ if __name__ == "__main__":
     website_url = sys.argv[1]
     
     # step 1 - scrape website
+    pid = os.getpid()
     posts, all_links = scrape_website(website_url)
+    print("Memory usage: ", psutil.Process(pid).memory_info().rss / 1024 ** 2, "MB")
 
 
     # # write posts to disk   
@@ -110,33 +114,33 @@ if __name__ == "__main__":
 
 
     # extract page classification
-    classifications = []
-    start_time = time.time()
-    for i, url in zip(range(len(posts)), posts):
-        print(f"Classifying {i}/{len(posts)}: {url}")
+    # classifications = []
+    # start_time = time.time()
+    # for i, url in zip(range(len(posts)), posts):
+    #     print(f"Classifying {i}/{len(posts)}: {url}")
 
-        elapsed_time = time.time() - start_time
-        print(f"Elapsed time: {elapsed_time} seconds")
+    #     elapsed_time = time.time() - start_time
+    #     print(f"Elapsed time: {elapsed_time} seconds")
 
-        executor = ThreadPoolExecutor(max_workers=1)
+    #     executor = ThreadPoolExecutor(max_workers=1)
 
-        for attempt in range(10):
-            future = executor.submit(extract_page_classification, url, posts[url])
-            try:
-                jsonresponse = future.result(timeout=20)
-                classifications.append(jsonresponse)
-                break
-            except:
-                if attempt > 9:  # 0-indexed, so 9 is the 10th attempt
-                    raise TimeoutError(f"Timed out on {url}")
-                print(f"Failed Attempt {attempt+1} of 10 on {url}. Waiting 60 seconds...")
-                time.sleep(60)
+    #     for attempt in range(10):
+    #         future = executor.submit(extract_page_classification, url, posts[url])
+    #         try:
+    #             jsonresponse = future.result(timeout=20)
+    #             classifications.append(jsonresponse)
+    #             break
+    #         except:
+    #             if attempt > 9:  # 0-indexed, so 9 is the 10th attempt
+    #                 raise TimeoutError(f"Timed out on {url}")
+    #             print(f"Failed Attempt {attempt+1} of 10 on {url}. Waiting 60 seconds...")
+    #             time.sleep(60)
 
 
 
-    # write classifications to disk
-    with open ('data/pg_classifications.json', 'w') as fp:
-        json.dump(classifications, fp, indent=4)
+    # # write classifications to disk
+    # with open ('data/pg_classifications.json', 'w') as fp:
+    #     json.dump(classifications, fp, indent=4)
 
 # for link in all_links:
 #     print(link)

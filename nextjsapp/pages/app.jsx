@@ -8,8 +8,6 @@ import {
     useDisclosure,
     Card,
     CardBody,
-    RadioGroup,
-    Radio,
     Spacer,
     CardHeader,
     Divider,
@@ -20,41 +18,29 @@ import {
 import {withAuth} from "@/utils/withAuth"
 
 import {
-    decodeUrl
-} from "@/utils/websiteNameConversion"
-
-import {
     doSignOut,
     authUser,
     user,
-    doSetUserFrequency,
     doSubscribeUserToWebsite,
     doUnsubscribeUserFromWebsite,
 } from "@/utils/firebase"
 
 import {
-    get,
     onValue
 } from "firebase/database"
 
 import { useState, useEffect } from "react";
 
-import {FREQUENCY_CHOICES} from "@/utils/constants"
-
 function App() {
     const [loading, setLoading] = useState(true)
 
-    const [userFrequency, setUserFrequency] = useState("NOT LOADED")
-    const [formFrequency, setFormFrequency] = useState("NOT LOADED")
-
     const [userWebsites, setUserWebsites] = useState([])
+    const [userWebsitesUnsubscribeLoading, setUserWebsitesUnsubscribeLoading] = useState({})
+
     const [formWebsite, setFormWebsite] = useState("")
     const [formWebsiteError, setFormWebsiteError] = useState(null)
     const [formWebsiteLoading, setFormWebsiteLoading] = useState(false)
 
-    const [unsubscribeLoading, setUnsubscribeLoading] = useState(false)
-
-    const {isOpen: isOpenFrequencyModal, onOpen: onOpenFrequencyModal, onOpenChange: onOpenChangeFrequencyModal} = useDisclosure();
 
     const {isOpen: isOpenAddWebsiteModal, onOpen: onOpenAddWebsiteModal, onOpenChange: onOpenChangeAddWebsiteModal} = useDisclosure();
 
@@ -83,10 +69,9 @@ function App() {
         onValue(user(authUser().uid), (snapshot) => {
             const data = snapshot.val()
             if(data){
-                setUserFrequency(data.frequency ? data.frequency : null)
-                setFormFrequency(data.frequency ? data.frequency : null)
-                setUserWebsites(data.subscriptions ? 
-                    Object.keys(data.subscriptions).map((encoded) => decodeUrl(encoded)) : [])
+                setUserWebsites(data.subscriptions ? Object.values(data.subscriptions) : [])
+                setUserWebsitesUnsubscribeLoading(data.subscriptions ? Object.values(data.subscriptions) : {})
+                setUserWebsitesUnsubscribeLoading(data.subscriptions ? Object.fromEntries(Object.values(data.subscriptions).map(website => [website, false])) : {})
                 setLoading(false)
             }
         })
@@ -110,50 +95,6 @@ function App() {
                                 Sign Out
                             </Button>
                             <Spacer y={4}/>
-                            <Button onPress={onOpenFrequencyModal} color="secondary">Change Email Frequency</Button>
-                            <Modal 
-                                isOpen={isOpenFrequencyModal} 
-                                onOpenChange={onOpenChangeFrequencyModal}
-                                placement="top-center"
-                            >
-                                <ModalContent>
-                                {(onClose) => (
-                                    <>
-                                    <ModalHeader className="flex flex-col gap-1">Change Frequency of Emails</ModalHeader>
-                                    <ModalBody>
-                                        <RadioGroup
-                                            label="How often do you want to receive posts?"
-                                            value={userFrequency}
-                                            orientation="horizontal"
-                                            defaultValue={userFrequency}
-                                        >
-                                            <Radio 
-                                                value={FREQUENCY_CHOICES.daily}
-                                                onChange={() => setUserFrequency(FREQUENCY_CHOICES.daily)}
-                                            >
-                                                Daily at 8am
-                                            </Radio>
-                                            <Radio 
-                                                value={FREQUENCY_CHOICES.weekly}
-                                                onChange={() => setUserFrequency(FREQUENCY_CHOICES.weekly)}
-                                            >
-                                                Mondays at 8am
-                                            </Radio>
-                                        </RadioGroup>
-                                    </ModalBody>
-                                    <ModalFooter>
-                                        <Button color="primary" onPress={()=>{
-                                            doSetUserFrequency(authUser().uid, formFrequency)
-                                            setUserFrequency(formFrequency)
-                                            onClose()
-                                        }}>
-                                            Save 
-                                        </Button>
-                                    </ModalFooter>
-                                    </>
-                                )}
-                                </ModalContent>
-                            </Modal>
                         </CardBody>
                     </Card>
                     <Card>
@@ -214,12 +155,11 @@ function App() {
                                         name={website}
                                         color="danger" 
                                         onClick={(e) => {
-                                            setUnsubscribeLoading(true)
+                                            setUserWebsitesUnsubscribeLoading({...userWebsitesUnsubscribeLoading, [website]: true})
                                             doUnsubscribeUserFromWebsite(website).then(() => {
-                                                setUnsubscribeLoading(false)
+                                                setUserWebsitesUnsubscribeLoading({...userWebsitesUnsubscribeLoading, [website]: false})
                                             })
-                                                setUserWebsites(userWebsites.filter(item => item !== website))
-                                            
+                                            setUserWebsites(userWebsites.filter(item => item !== website))
                                         }}
                                         isLoading={unsubscribeLoading}
                                         size="sm"

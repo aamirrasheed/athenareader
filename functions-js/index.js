@@ -10,7 +10,7 @@ admin.initializeApp();
 
 const axios = require('axios');
 
-const {encodeUrl} = require('./utils');
+const {encodeURLforRTDB} = require('./utils');
 
 exports.createUserInDatabaseOnSignup = functions.auth.user().onCreate((user, context) => {
     // create an entry for the user in realtime database
@@ -77,26 +77,25 @@ exports.addSubscription = functions.https.onCall(async (data, context) => {
     })
     .then(async (website) => {
         // encode website 
-        const encoded_website = encodeUrl(website);
+        const encodedWebsite = encodeURLforRTDB(website);
 
-        await admin.database().ref(`websites/${encoded_website}`).once("value", async (snapshot) => {
+        // check if website exists in database
+        await admin.database().ref(`websites/${encodedWebsite}`).once("value", async (snapshot) => {
             // if website doesn't exist, go scrape it in the background
             if (!snapshot.exists()) {
 
-                let url;
+                let scrapeWebsiteURL;
                 console.log("process.env.FUNCTIONS_EMULATOR set to ", process.env.FUNCTIONS_EMULATOR)
                 if (process.env.FUNCTIONS_EMULATOR) {
-                    url = 'http://localhost:5001/sendittomyemail-4c3ca/us-central1/extractPagesFromWebsite'
+                    scrapeWebsiteURL = 'http://localhost:5001/sendittomyemail-4c3ca/us-central1/extractPagesFromWebsite'
                 }
                 else {
-                    url = 'https://us-central1-sendittomyemail-4c3ca.cloudfunctions.net/extractPagesFromWebsite';
+                    scrapeWebsiteURL = 'https://us-central1-sendittomyemail-4c3ca.cloudfunctions.net/extractPagesFromWebsite';
                 }
 
-                const encodedWebsite = encodeUrl(website);
-                
-                const getUrl = `${url}?website=${encodedWebsite}`
-                console.log("Sending GET request to ", getUrl)
-                axios.get(getUrl)
+                axios.post(scrapeWebsiteURL, {
+                    websiteToScrape: website
+                })
                 .catch(function (error) {
                     console.log(error);
                 });
@@ -104,12 +103,12 @@ exports.addSubscription = functions.https.onCall(async (data, context) => {
             }
         })
 
-        return encoded_website
-    }).then((encoded_website) => {
-        console.log("Encoded website is", encoded_website)
+        return website
+    }).then((website) => {
 
         // record a user subcription to the database
-        return admin.database().ref(`users/${context.auth.uid}/subscriptions/${encoded_website}`).set("true")
+        console.log("Recording subscription to database")
+        return admin.database().ref(`users/${context.auth.uid}/subscriptions/${encodeURLforRTDB(website)}`).set(website)
     }).then(() => {
         return {result: "success"}
     })
@@ -122,8 +121,9 @@ exports.addSubscription = functions.https.onCall(async (data, context) => {
 // TODO: Add CORS filtering to only allow deployed functions to call this function
 // May need to be done on the google cloud console under "invoker" permissions
 exports.deleteSubscription = functions.https.onCall(async (data, context) => {
-    const encoded_website = encodeUrl(data.website);
-    admin.database().ref(`users/${context.auth.uid}/subscriptions/${encoded_website}`).remove()
+    const userUID = context.auth.uid;
+    const encodedWebsite = encodeURLforRTDB(data.website);
+    admin.database().ref(`users/${userUID}/subscriptions/${encodedWebsite}`).remove()
     .then(() => {
         return {result: "success"}
     })

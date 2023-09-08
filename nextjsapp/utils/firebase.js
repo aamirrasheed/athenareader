@@ -83,25 +83,15 @@ const user = uid => ref(firebaseDb, `users/${uid}`);
 function doSetUserFrequency(uid, frequency) { set(ref(firebaseDb, `users/${uid}/frequency`), frequency);}
 
 const doSubscribeUserToWebsite = (url) => {
-    console.log("doSubscribeUserToWebsite called with website", url)
 
     const addSubscription = httpsCallable(firebaseFunctions, 'addSubscription');
     return addSubscription({website: url})
-    .then((result) => {
-        const data = result.data;
-        console.log("Returned response from addSubscription: ", data);
-    })
 }
 
 const doUnsubscribeUserFromWebsite = (url) => {
-    console.log("doUnsubscribeUserFromWebsite")
 
     const deleteSubscription = httpsCallable(firebaseFunctions, 'deleteSubscription');
     return deleteSubscription({website: url})
-    .then((result) => {
-        const data = result.data;
-        console.log("Returned response from deleteSubscription: ", data);
-    })
 }
 
 export {
