@@ -1,6 +1,6 @@
 const crypto = require('crypto');
 
-function encodeURLForRTDB(url) {
+function encodeURLforRTDB(url) {
     return crypto.createHash('sha256').update(url).digest('hex');
 
 }

@@ -161,10 +161,10 @@ function App() {
                                             })
                                             setUserWebsites(userWebsites.filter(item => item !== website))
                                         }}
-                                        isLoading={unsubscribeLoading}
+                                        isLoading={userWebsitesUnsubscribeLoading[website]}
                                         size="sm"
                                     >
-                                        {unsubscribeLoading? "": "Unsubscribe"}
+                                        {userWebsitesUnsubscribeLoading[website] ? "": "Unsubscribe"}
                                     </Button>
                                 </div>
                                 <Spacer y={2}/>

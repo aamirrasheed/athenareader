@@ -18,7 +18,7 @@ from utils import extract_posts
 def extractPagesFromWebsite(req):
     '''
     Input: 
-    A GET request that contains a blog url to scrape
+    A POST request that contains a blog url to scrape in the 'website' key
     
     Output:
     Realtime Database contains an entry under /websites with the following structure:
@@ -30,19 +30,24 @@ def extractPagesFromWebsite(req):
                 - body
     
     '''
-    # Step 1: get the website URL
-    if "website" in req.args:
-        encoded_website_url = extract_posts.encode_url(req.args["website"])
-        decoded_website_url = extract_posts.decode_url(req.args["website"])
+    # Step 1: get the website URL from the POST request
+    if req.method == 'POST':
+        data = req.get_json()
+        if not "websiteToScrape" in data:
+            raise Exception("'websiteToScrape' key not provided in the POST request")
     else:
-        raise Exception("No website url provided")
-    
-    print("scrapeWebsite triggered with url:", decoded_website_url)
+        raise Exception("This function only accepts POST requests")
+
+    website_url = data["websiteToScrape"]
+    print("scrapeWebsite triggered with url:", website_url)
+    encoded_website_url = extract_posts.encode_url_for_rtdb(data["websiteToScrape"])
 
     # Step 2: Write initial entry to /websites
     ref = db.reference('/')
     website_ref = ref.child('websites').child(encoded_website_url)
+    website_ref.child('url').set(website_url)
     website_ref.child('date-added').set(time.time())
+    website_ref.child('date-last-scraped').set(time.time())
     
     # Step 3: Define recursive function to scrape website
     def scrape_website(website_url, depth_to_scrape=2):
@@ -64,10 +69,15 @@ def extractPagesFromWebsite(req):
                 website_text = soup.get_text()
 
                 # write to /websites
-                encoded_page_url = extract_posts.encode_url(url)
-                website_ref.child('unprocessed-page-urls').child(encoded_page_url).child("body").set(website_text)
+                encoded_page_url = extract_posts.encode_url_for_rtdb(url)
+                page_ref = website_ref.child('unprocessed-pages').child(encoded_page_url)
+                page_ref.child("url").set(url)
+                page_ref.child("body").set(website_text)
+
+                # counter for debugging purposes
                 nonlocal num_pages
                 num_pages += 1
+
                 # if max_depth reached, pop outta here
                 if(depth == max_depth):
                     return existing_hrefs
@@ -84,7 +94,6 @@ def extractPagesFromWebsite(req):
                     if urlparse(absolute_url).netloc == urlparse(url).netloc:
                         found_hrefs.add(absolute_url)
                 
-
                 # determine which links are new
                 new_hrefs = found_hrefs.difference(existing_hrefs)
 
@@ -111,11 +120,10 @@ def extractPagesFromWebsite(req):
         return extract_links(website_url, max_depth=depth_to_scrape), num_pages
 
     # Step 4: Scrape the posts from the website
-    all_links, num_pages = scrape_website(decoded_website_url)
+    all_links, num_pages = scrape_website(website_url)
 
     print("Saved", len(all_links), "links")
     print("Found", num_pages, "pages")
-
     
     return "Success"
     
