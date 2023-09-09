@@ -3,6 +3,8 @@ import time
 from urllib.parse import urlparse, urljoin
 import requests
 from bs4 import BeautifulSoup
+import base64
+from tiktoken import encoding_for_model
 
 from firebase_admin import db
 from firebase_admin import initialize_app
@@ -24,10 +26,12 @@ def extractPagesFromWebsite(req):
     Realtime Database contains an entry under /websites with the following structure:
     - websites
         - website-urls
+            - date-added
+            - added-by
             - date-last-scraped
             - unprocessed-page-urls
                 - url
-                - body
+                - raw-html
     
     '''
     # Step 1: get the website URL from the POST request
@@ -42,12 +46,21 @@ def extractPagesFromWebsite(req):
     print("scrapeWebsite triggered with url:", website_url)
     encoded_website_url = extract_posts.encode_url_for_rtdb(data["websiteToScrape"])
 
-    # Step 2: Write initial entry to /websites
     ref = db.reference('/')
     website_ref = ref.child('websites').child(encoded_website_url)
-    website_ref.child('url').set(website_url)
-    website_ref.child('date-added').set(time.time())
-    website_ref.child('date-last-scraped').set(time.time())
+
+    # Step 1.5: Check if website already scraped. If so, return success early
+    if website_ref.get() is not None:
+        print("Website already scraped. Returning early")
+        return "Success"
+
+    # Step 2: Write initial entry to /websites
+    website_ref.set({
+        'url': website_url,
+        'date-added': time.time(),
+        'added-by': data['addedBy'],
+        'date-last-scraped': time.time(),
+    })
     
     # Step 3: Define recursive function to scrape website
     def scrape_website(website_url, depth_to_scrape=2):
@@ -69,15 +82,11 @@ def extractPagesFromWebsite(req):
                 # valid url, add to existing_hrefs
                 existing_hrefs.add(url)
 
-                # get page content and save to posts for classification later on
-                soup = BeautifulSoup(response.content, 'html.parser')
-                website_text = soup.get_text()
-
-                # write to /websites
+                # get page content and save to /websites for classification later on
                 encoded_page_url = extract_posts.encode_url_for_rtdb(url)
                 page_ref = website_ref.child('unprocessed-pages').child(encoded_page_url)
                 page_ref.child("url").set(url)
-                page_ref.child("body").set(website_text)
+                page_ref.child("raw-html").set(response.text)
 
                 # counter for debugging purposes
                 nonlocal num_pages
@@ -86,8 +95,9 @@ def extractPagesFromWebsite(req):
                 # if max_depth reached, pop outta here
                 if(depth == max_depth):
                     return existing_hrefs
-
+                
                 # get links inside the page soup for further recursive madness
+                soup = BeautifulSoup(response.content, 'html.parser')
                 found_hrefs = set()
                 for element in soup.find_all(href=True):
                     href_value = element['href']
@@ -132,84 +142,185 @@ def extractPagesFromWebsite(req):
     
     return "Success"
     
-# def extractPostsFromUnclassifiedPages():
-#     '''
-#     Not all pages are classified in the extractPosts function. This function will take care of the rest of them.
-
-#     Input:
-#     None
-
-#     Output:
-#     1. Realtime Database contains an entry under /websites with the following structure:
-#         - websites
-#             - website-urls
-#                 - date-added
-#                 - unprocessed-page-urls
-#                     - url
-#                     - body
-#                 - posts
-#                     - post-urls 
-#     2. Realtime Database contains entries under /posts with the following structure:
-#         - posts
-#             - post-urls
-#                 - title
-#                 - date
-#                 - body
-#                 - summary
-#                 - date-last-scraped 
-#     '''
-#     ref = db.reference('/')
-# Step 3: Classify and extract title, date, and body from first five posts
-    # classifications = []
-    # NUM_POSTS_TO_CLASSIFY_AT_THIS_TIME = 5
-    # i = 0
-    # for url in pages:
-    #     if i >= NUM_POSTS_TO_CLASSIFY_AT_THIS_TIME:
-    #         break
-
-    #     print(f"Classifying {i}/{NUM_POSTS_TO_CLASSIFY_AT_THIS_TIME}: {url}")
-
-    #     executor = ThreadPoolExecutor(max_workers=1)
-
-    #     # OpenAI has unpredictable timeouts, so we'll try 3 times before giving up
-    #     for attempt in range(3):
-    #         future = executor.submit(extract_posts.classify_page, url, pages[url])
-    #         try:
-    #             # give it 20 seconds to complete
-    #             jsonresponse = future.result(timeout=20)
-    #             classifications.append(jsonresponse)
-    #             pages[url] = False
-    #             i+=1
-    #             break
-    #         except Exception as e:
-    #             print(f"Failed Attempt {attempt+1} of 3 on {url}. Error: {type(e).__name__} - {e}")
-    #             if attempt >= 2: 
-    #                 print(f"Timed out on {url}")
-    #                 break
-    #             print("Waiting 10 seconds")
-    #             # wait 10 seconds before trying again
-    #             time.sleep(10)
-    # Step 6: Save the classified posts to /posts and record cross links in /websites in Realtime Database
-    # for classification in classifications:
-    #     # skip non-blogposts
-    #     if classification['blogpost'] == 'no':
-    #         continue
-
-    #     # encode post URL for realtime database compatibility
-    #     encoded_post_url = extract_posts.encode_url(classification['url'])
-
-    #     # Write to /posts
-    #     post_ref = ref.child('posts').child(encoded_post_url)
-    #     post_ref.set({
-    #         'title': classification['title'],
-    #         'date': classification['date'],
-    #         'body': classification['body'],
-    #         'summary': classification['summary'],
-    #         'date-last-scraped': time.time(),
-    #     })
-
-    #     # write /posts uuid to corresponding entry in /websites
-    #     website_post_ref = ref.child('websites').child(encoded_website_url).child('posts').child(encoded_post_url)
-    #     website_post_ref.set(True)
+# TODO: Switch this to a scheduled function
+@functions_framework.http
+def processWebsitePages(req):
+    '''
+    Users are subscribing to blogs. Those websites are being scraped with pages stored at
+    /websites/hashed-website-url/unprocessed-pages.
     
+    This function will either classify these pages as blogposts or not blogposts. 
+    
+    If the page is a blogpost, we will also extract the title, date, summary and save it to /posts.
 
+    We will also save the hashed post url and encoded html to the corresponding website under 
+    /websites/posts/hashed-post-urls.
+
+    If the page is not a blogpost, we'll save the url and encoded html under 
+    /websites/hashed-website-url/not-posts.
+
+    Finally, we'll also save the number of tokens being passed into OpenAI so that we can keep track
+    of how much we're spending on OpenAI and the rate.
+
+    See schema below for a more visual representation of the data structure.
+
+    This function will run every 30 minutes and classify max 25 posts per website and 100 pages total
+    to limit the amount of money we spend with OpenAI.
+
+    Input:
+    None
+
+    Output:
+    1. Realtime Database contains an entries under /websites with the following structure:
+        - websites
+            - hashed-website-urls
+                - date-added
+                - date-last-scraped
+                - unprocessed-pages
+                    - hashed-page-urls
+                        - url
+                        - raw-html
+                - not-posts
+                    - hashed-page-urls
+                        - url
+                        - raw-html
+                - posts
+                    - hashed-post-urls:
+                        - url
+                        - raw-html
+
+    2. Realtime Database contains entries under /posts with the following structure:
+        - posts
+            - hashed-post-urls
+                - url 
+                - title
+                - date-published
+                - body
+                - summary
+                - date-last-scraped 
+    3. Realtime Database contains entries under /open-ai-calls with the following structure:
+        - open-ai-calls
+            -uuid
+                - unix-timestamp
+                - page-url
+                - input-tokens
+                - output-tokens
+    '''
+
+    # Step 1: Loop through all websites
+    websites_ref = db.reference('/').child('websites')
+    websites = websites_ref.get()
+
+    total_pages = 0
+    for website in websites:
+
+        # Step 2: loop through unprocessed pages in websites
+        unprocessed_pages_ref = websites_ref.child(website).child('unprocessed-pages')
+        unprocessed_pages = unprocessed_pages_ref.get()
+        website_url = websites_ref.child(website).child('url').get()
+        num_pages = 0
+        num_posts = 0
+
+        for unprocessed_page in unprocessed_pages:
+
+            # Step 3: get data from unprocessed page
+            page_ref = unprocessed_pages_ref.child(unprocessed_page)
+            page = page_ref.get()
+            page_url = page['url']
+            body = BeautifulSoup(page['raw-html'], 'html.parser').get_text() 
+
+            # Step 4: classify page
+            # OpenAI has unpredictable timeouts, so we'll try 3 times before giving up
+            executor = ThreadPoolExecutor(max_workers=1)
+            classification = None
+            num_input_tokens = None
+            num_output_tokens = None
+            for attempt in range(3):
+                future = executor.submit(extract_posts.classify_page, page_url, body)
+                try:
+                    # give it 20 seconds to complete
+                    classification, num_input_tokens, num_output_tokens = future.result(timeout=20)
+                    break
+                except Exception as e:
+                    print(f"Failed Attempt {attempt+1} of 3 on {page_url}. Error: {type(e).__name__} - {e}")
+                    if attempt >= 2:
+                        if type(e).__name__ == "ValueError":
+                            classification = 0
+                        print(f"Timed out on {page_url}")
+                        break
+                    print("Waiting 10 seconds")
+                    # wait 10 seconds before trying again
+                    time.sleep(10)
+
+            # if we're not getting a response from OpenAI, which means token limits are being reached or the API is 
+            # down. Let's rerun this function later.
+            if classification is None:
+                print("OpenAI limit reached. Exiting function")
+                return "Failure"
+            
+            # Step 5: save the number of input/output tokens to /open-ai-calls
+            open_ai_calls_ref = db.reference('/').child('open-ai-calls')
+            open_ai_calls_ref.push({
+                'unix-timestamp': time.time(),
+                'page-url': page_url,
+                'website-url': website_url,
+                'input-tokens': num_input_tokens,
+                'output-tokens': num_output_tokens,
+            })
+            
+            # Step 6: check if we're getting JSON or not. If not, there's some nondeterminism with
+            # the prompt and we should just move on to the next page, we'll come back to this one later
+            if classification == 0:
+                print("Prompt not returning JSON. Going to next page")
+                continue
+
+            # Step 7: save the classification to Realtime Database
+            hashed_page_url = extract_posts.encode_url_for_rtdb(page_url)
+            if classification['blogpost'] == 'yes':
+                # save to /posts
+                post_ref = db.reference('/').child('posts').child(hashed_page_url)
+                post_ref.set({
+                    'url': page_url,
+                    'title': classification['title'],
+                    'date-published': classification['date'],
+                    'summary': classification['summary'],
+                    'body': body,
+                    'date-last-scraped': time.time(),
+                })
+
+                # save processed post to /websites
+                website_post_ref = websites_ref.child(website).child('posts').child(hashed_page_url)
+                website_post_ref.set({
+                    'url': page_url,
+                    'raw-html': page['raw-html'],
+                })
+                num_posts += 1
+            else:
+                # save to /websites
+                not_post_ref = websites_ref.child(website).child('not-posts').child(hashed_page_url)
+                not_post_ref.set({
+                    'url': page_url,
+                    'raw-html': page['raw-html'],
+                })
+            
+            # Step 8: Update the date-last-scraped for this website
+            websites_ref.child(website).child('date-last-scraped').set(time.time())
+
+            # Step 9: Delete from this page /websites/unprocessed-pages
+            page_ref.delete()
+
+            # Step 10: Update the number of pages/posts processed for this website and break if limit reached
+            num_pages += 1
+            print("Processed", num_pages, "pages and", num_posts, "posts for", website_url)
+            if num_posts >= 10 or num_pages >= 25:
+                print("Skipping to next website because processed 10 posts or 25 pages for", website_url)
+                break
+
+        # Step 11: Update the number of pages/posts processed total and break if limit reached
+        total_pages += num_pages
+        print("Processed", total_pages, "pages total")
+        if total_pages >= 100:
+            print("Processed at least 100 pages total. Exiting function")
+            break
+
+    return "Success"

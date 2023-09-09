@@ -16,23 +16,28 @@ def classify_page(url, body):
         num_other_tokens = len(enc.encode(prompt + url))
         body = enc.decode(enc.encode(body)[:1000 - num_other_tokens])
 
+    # full prompt for model
+    full_prompt = f"{prompt} \n \n URL: {url} \n Body: {body}"
+
     # get the chatGPT response
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=[
                 {"role": "system", "content": "You are a helpful assistant."},
-                {"role": "user", "content": f"{prompt} \n \n URL: {url} \n Body: {body}"},
+                {"role": "user", "content": full_prompt},
             ]
     )
     classification = response["choices"][0]["message"]["content"]
+    num_input_tokens = response["usage"]["prompt_tokens"]
+    num_output_tokens = response["usage"]["completion_tokens"]
 
     try:
-        return json.loads(classification)
+        return json.loads(classification), num_input_tokens, num_output_tokens
     except:
         # sometimes, chatGPT adds extra unnecessary words around the JSON response. This should catch that.
         match = re.search(r'\{.*\}', classification)
         if match:
-            return json.loads(match.group())
+            return json.loads(match.group()), num_input_tokens, num_output_tokens
         else:
             raise ValueError(f"Unable to parse chatGPT response. The following: \n \n {classification} \n \n is not JSON")
     

@@ -27,7 +27,7 @@ exports.addSubscription = functions.https.onCall(async (data, context) => {
     // Message text passed from the client.
     const website = data.website;
 
-    // start with url validation
+    // start by making sure it has the correct protocol
     return new Promise((resolve, reject) => {
         // Check if the URL already has a scheme
         if (website.startsWith('http://')) {
@@ -94,7 +94,8 @@ exports.addSubscription = functions.https.onCall(async (data, context) => {
                 }
 
                 axios.post(scrapeWebsiteURL, {
-                    websiteToScrape: website
+                    websiteToScrape: website,
+                    addedBy: context.auth.uid
                 })
                 .catch(function (error) {
                     console.log(error);
