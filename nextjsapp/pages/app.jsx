@@ -44,7 +44,7 @@ function App() {
 
     const {isOpen: isOpenAddWebsiteModal, onOpen: onOpenAddWebsiteModal, onOpenChange: onOpenChangeAddWebsiteModal} = useDisclosure();
 
-    const handleFormWebsiteSubmit = (onClose) => {
+    const handleFormWebsiteSubmit = (onClose, e) => {
         setFormWebsiteLoading(true)
         if(userWebsites.includes(formWebsite)) {
             setFormWebsiteError("Website already exists")
@@ -128,13 +128,14 @@ function App() {
                                                 setFormWebsite(e.target.value)
                                                 setFormWebsiteError(null)
                                             }}
-                                            onKeyDown={e => e.key === 'Enter' ? handleFormWebsiteSubmit(onClose): null}
                                         />
                                     </ModalBody>
                                     <ModalFooter>
                                         <Button 
                                             color="primary" 
-                                            onPress={(e) => handleFormWebsiteSubmit(onClose)}
+                                            onPress={e => {
+                                                handleFormWebsiteSubmit(onClose)
+                                            }}
                                             isLoading={formWebsiteLoading}
                                         >
                                             {formWebsiteLoading ? "" : "Save"}
@@ -155,6 +156,7 @@ function App() {
                                         name={website}
                                         color="danger" 
                                         onClick={(e) => {
+                                            e.preventDefault()
                                             setUserWebsitesUnsubscribeLoading({...userWebsitesUnsubscribeLoading, [website]: true})
                                             doUnsubscribeUserFromWebsite(website).then(() => {
                                                 setUserWebsitesUnsubscribeLoading({...userWebsitesUnsubscribeLoading, [website]: false})
