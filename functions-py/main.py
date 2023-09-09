@@ -58,7 +58,12 @@ def extractPagesFromWebsite(req):
         def extract_links(url, existing_hrefs=set(), max_depth=4, depth=0):
             
             base_url = urlparse(url).scheme + "://" + urlparse(url).netloc
-            response = requests.get(url)
+            try:
+                response = requests.get(url)
+            except Exception as e:
+                print("Error getting", url, ":", e)
+                print("Recursing upwards")
+                return existing_hrefs
             
             if response.status_code == 200:
                 # valid url, add to existing_hrefs
