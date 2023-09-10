@@ -142,7 +142,6 @@ def extractPagesFromWebsite(req):
     
     return "Success"
     
-# TODO: Switch this to a scheduled function
 @functions_framework.http
 def processWebsitePages(req):
     '''
