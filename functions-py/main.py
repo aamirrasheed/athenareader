@@ -59,7 +59,6 @@ def extractPagesFromWebsite(req):
         'url': website_url,
         'date-added': time.time(),
         'added-by': data['addedBy'],
-        'date-last-scraped': time.time(),
     })
     
     # Step 3: Define recursive function to scrape website
@@ -141,6 +140,8 @@ def extractPagesFromWebsite(req):
 
     # Step 4: Scrape the posts from the website
     all_links, num_pages = scrape_website(website_url)
+
+    website_ref.child('date-last-scraped').set(time.time())
 
     print("Saved", len(all_links), "links")
     print("Found", num_pages, "pages")
