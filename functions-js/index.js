@@ -10,7 +10,12 @@ admin.initializeApp();
 
 const axios = require('axios');
 
-const {encodeURLforRTDB} = require('./utils');
+const {
+    encodeURLforRTDB,
+    getValidURL,
+    INVALID_URL_ERROR,
+    UNABLE_TO_CALL_FUNCTION_ERROR
+} = require('./utils');
 
 exports.createUserInDatabaseOnSignup = functions.auth.user().onCreate((user, context) => {
     // create an entry for the user in realtime database
@@ -28,51 +33,13 @@ exports.addSubscription = functions.https.onCall(async (data, context) => {
     const website = data.website;
 
     // start by making sure it has the correct protocol
-    return new Promise((resolve, reject) => {
-        // Check if the URL already has a scheme
-        if (website.startsWith('http://')) {
-            console.log("Starts with http")
-            http.get(website, (res) => {
-                if(res.statusCode === 200){
-                    resolve(website);
-                } else {
-                    reject('Invalid URL');
-                }
-            }).on('error', (err) => {
-                reject('Invalid URL');
-            }).end();
+    return getValidURL(website).then(res => {
+        if (res === INVALID_URL_ERROR) {
+            throw new Error(INVALID_URL_ERROR)
         }
-        else if (website.startsWith('https://')) {
-            console.log("Starts with https")
-            https.get(website, (res) => {
-                if(res.statusCode === 200){
-                    resolve(website);
-                } else {
-                    reject('Invalid URL');
-                }
-            }).on('error', (err) => {
-                reject('Invalid URL');
-            }).end();
-        } else {
-            // It's a schemeless URL - let's try both http and https
-            console.log("Trying with http")
-            http.get('http://' + website, (res) => {
-                if(res.statusCode === 200){
-                    resolve('http://' + website);
-                    
-                } else {
-                    console.log("Trying with https")
-                    https.get('https://' + website, (res) => {
-                        if(res.statusCode === 200){
-                            resolve('https://' + website);
-                        } else {
-                            reject('Invalid URL');
-                        }
-                    }).on('error', (err) => {
-                        reject('Invalid URL');
-                    }).end();
-                }
-            }).end();
+        // this should be the fully formed corect URL
+        else {
+            return res;
         }
     })
     .then(async (website) => {
@@ -98,7 +65,7 @@ exports.addSubscription = functions.https.onCall(async (data, context) => {
                     addedBy: context.auth.uid
                 })
                 .catch(function (error) {
-                    console.log(error);
+                    console.log(UNABLE_TO_CALL_FUNCTION_ERROR)
                 });
 
             }
@@ -114,8 +81,7 @@ exports.addSubscription = functions.https.onCall(async (data, context) => {
         return {result: "success"}
     })
     .catch((error) => {
-        console.log(error)
-        return {result: "error"}
+        return {result: error}
     })
 })
 

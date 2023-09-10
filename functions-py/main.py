@@ -73,6 +73,11 @@ def extractPagesFromWebsite(req):
             base_url = urlparse(url).scheme + "://" + urlparse(url).netloc
             try:
                 response = requests.get(url)
+                if response.status_code != 200:
+                    headers = {
+                        'User-Agent': 'sendittomyemail-bot'
+                    }
+                    response = requests.get(url, headers=headers)
             except Exception as e:
                 print("Error getting", url, ":", e)
                 print("Recursing upwards")
