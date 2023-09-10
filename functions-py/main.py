@@ -215,14 +215,14 @@ def processWebsitePages(req):
 
     # Step 1: Loop through all websites
     websites_ref = db.reference('/').child('websites')
-    websites = websites_ref.get()
+    websites = websites_ref.get(shallow=True)
 
     total_pages = 0
     for website in websites:
 
         # Step 2: loop through unprocessed pages in websites
         unprocessed_pages_ref = websites_ref.child(website).child('unprocessed-pages')
-        unprocessed_pages = unprocessed_pages_ref.get()
+        unprocessed_pages = unprocessed_pages_ref.get(shallow=True) # this prevents us from using unnecessary memory
         website_url = websites_ref.child(website).child('url').get()
         num_pages = 0
         num_posts = 0
@@ -237,26 +237,26 @@ def processWebsitePages(req):
 
             # Step 4: classify page
             # OpenAI has unpredictable timeouts, so we'll try 3 times before giving up
-            executor = ThreadPoolExecutor(max_workers=1)
             classification = None
             num_input_tokens = None
             num_output_tokens = None
             for attempt in range(3):
-                future = executor.submit(extract_posts.classify_page, page_url, body)
-                try:
-                    # give it 20 seconds to complete
-                    classification, num_input_tokens, num_output_tokens = future.result(timeout=20)
-                    break
-                except Exception as e:
-                    print(f"Failed Attempt {attempt+1} of 3 on {page_url}. Error: {type(e).__name__} - {e}")
-                    if attempt >= 2:
-                        if type(e).__name__ == "ValueError":
-                            classification = 0
-                        print(f"Timed out on {page_url}")
+                with ThreadPoolExecutor(max_workers=1) as executor:
+                    future = executor.submit(extract_posts.classify_page, page_url, body)
+                    try:
+                        # give it 20 seconds to complete
+                        classification, num_input_tokens, num_output_tokens = future.result(timeout=20)
                         break
-                    print("Waiting 10 seconds")
-                    # wait 10 seconds before trying again
-                    time.sleep(10)
+                    except Exception as e:
+                        print(f"Failed Attempt {attempt+1} of 3 on {page_url}. Error: {type(e).__name__} - {e}")
+                        if attempt >= 2:
+                            if type(e).__name__ == "ValueError":
+                                classification = 0
+                            print(f"Timed out on {page_url}")
+                            break
+                        print("Waiting 10 seconds")
+                        # wait 10 seconds before trying again
+                        time.sleep(10)
 
             # if we're not getting a response from OpenAI, which means token limits are being reached or the API is 
             # down. Let's rerun this function later.
