@@ -131,7 +131,8 @@ def extractPagesFromWebsite(req):
                     
             else:
                 # Invalid URL, so remove the URL from the list of links to scrape
-                existing_hrefs.remove(url)
+                if url in existing_hrefs:
+                    existing_hrefs.remove(url)
             
             # return all the links we found
             return existing_hrefs
