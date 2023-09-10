@@ -35,6 +35,7 @@ exports.addSubscription = functions.https.onCall(async (data, context) => {
     // start by making sure it has the correct protocol
     return getValidURL(website).then(res => {
         if (res === INVALID_URL_ERROR) {
+            console.log("Unable to get valid URL")
             throw new Error(INVALID_URL_ERROR)
         }
         // this should be the fully formed corect URL
@@ -79,9 +80,6 @@ exports.addSubscription = functions.https.onCall(async (data, context) => {
         return admin.database().ref(`users/${context.auth.uid}/subscriptions/${encodeURLforRTDB(website)}`).set(website)
     }).then(() => {
         return {result: "success"}
-    })
-    .catch((error) => {
-        return {result: error}
     })
 })
 
