@@ -1,7 +1,8 @@
 // extractPagesFromWebsite
-gcloud functions deploy extractPagesFromWebsite --gen2 --runtime=python311 --region=us-central1 --source=. --memory 512MB \
---entry-point=extractPagesFromWebsite --trigger-http --allow-unauthenticated --timeout 540
+gcloud functions deploy extractPagesFromWebsite --gen2 --runtime=python311 --region=us-central1 --source=. --memory 512MB --entry-point=extractPagesFromWebsite --trigger-http --allow-unauthenticated --timeout 540
 
 // processWebsitePages
-gcloud functions deploy processWebsitePages --gen2 --runtime=python311 --region=us-central1 --source=. --memory 512MB \
---entry-point=processWebsitePages --trigger-http --allow-unauthenticated --timeout 540 --set-env-vars OPENAI_API_KEY=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
+gcloud functions deploy processWebsitePages --gen2 --runtime=python311 --region=us-central1 --source=. --memory 512MB --entry-point=processWebsitePages --trigger-http --allow-unauthenticated --timeout 540 --set-env-vars OPENAI_API_KEY=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
+
+// cloud scheduler job for processWebsitePages
+gcloud scheduler jobs create http processWebsitePagesJob --schedule="*/30 * * * *" --http-method=GET --location=us-central1 --uri=https://us-central1-sendittomyemail-4c3ca.cloudfunctions.net/processWebsitePages

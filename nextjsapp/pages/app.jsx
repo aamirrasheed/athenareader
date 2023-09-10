@@ -42,7 +42,7 @@ function App() {
     const [formWebsiteLoading, setFormWebsiteLoading] = useState(false)
 
 
-    const {isOpen: isOpenAddWebsiteModal, onOpen: onOpenAddWebsiteModal, onOpenChange: onOpenChangeAddWebsiteModal} = useDisclosure();
+    const {isOpen: isOpenAddWebsiteModal, onOpen: onOpenAddWebsiteModal, onOpenChange: onOpenChangeAddWebsiteModal, onClose: onCloseAddWebsiteModal} = useDisclosure();
 
     const handleFormWebsiteSubmit = (onClose, e) => {
         setFormWebsiteLoading(true)
@@ -56,7 +56,8 @@ function App() {
                 onClose()
             })
             .catch((error) => {
-                setFormWebsiteError(error.message)
+                console.log("Error when calling doSubscribeUserToWebsite:", error)
+                setFormWebsiteError("That seems to be an invalid URL. Try copy pasting the entire URL from the browser. Example: http://paulgraham.com/")
             })
             .finally(() => {
                 setFormWebsiteLoading(false)
@@ -111,6 +112,11 @@ function App() {
                             <Modal 
                                 isOpen={isOpenAddWebsiteModal} 
                                 onOpenChange={onOpenChangeAddWebsiteModal}
+                                onClose={() => {
+                                    onCloseAddWebsiteModal()
+                                    setFormWebsite("")
+                                    setFormWebsiteError(null)
+                                }}
                                 placement="top-center"
                             >
                                 <ModalContent>
