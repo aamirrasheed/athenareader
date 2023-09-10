@@ -70,6 +70,9 @@ exports.addSubscription = functions.https.onCall(async (data, context) => {
                 });
 
             }
+            else {
+                console.log("Website already exists in database")
+            }
         })
 
         return website
