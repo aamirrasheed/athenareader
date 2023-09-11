@@ -291,7 +291,7 @@ def processWebsitePages(req):
                     'date-published': classification['date'],
                     'summary': classification['summary'],
                     'body': body,
-                    'raw-html': page['raw_html'],
+                    'raw-html': page['raw-html'],
                     'date-last-scraped': time.time(),
                 })
 
