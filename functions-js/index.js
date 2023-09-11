@@ -152,7 +152,7 @@ exports.sendEmailAsSummarizedLinks = functions.https.onRequest((req, res) => {
                     // Step 2: Gather posts from those subscriptions and weight them such that each website is equally likely to be chosen,
                     // and each post within a website is equally likely to be chosen
                     let postsFromSelectedSubscriptions = {};
-                    let promises = selectedSubscriptions.forEach(selectedSubscription => {
+                    let promises = selectedSubscriptions.map(selectedSubscription => {
                         return admin.database().ref(`websites/${selectedSubscription}/posts`).once('value')
                         .then(postsSnapshot => {
                             const posts = postsSnapshot.val();
@@ -185,8 +185,8 @@ exports.sendEmailAsSummarizedLinks = functions.https.onRequest((req, res) => {
                             selectedHashedPostUrls.push(selectedPost);
 
                             // Remove the selected post and break if there are no posts left
-                            postsFromSelectedSubscriptions = postsFromSelectedSubscriptions.filter(url => url !== selectedPost);
-                            if (postsFromSelectedSubscriptions.length === 0) {
+                            delete postsFromSelectedSubscriptions[selectedPost];
+                            if (Object.keys(postsFromSelectedSubscriptions).length === 0) {
                                 break;
                             }
                         }
