@@ -96,8 +96,8 @@ def extractPagesFromWebsite(req):
                 nonlocal num_pages
                 num_pages += 1
 
-                # if max_depth reached, pop outta here
-                if(depth == max_depth):
+                # if max_depth reached or max pages reached, pop outta here
+                if(depth == max_depth or num_pages > 50):
                     return existing_hrefs
                 
                 # get links inside the page soup for further recursive madness
@@ -291,15 +291,12 @@ def processWebsitePages(req):
                     'date-published': classification['date'],
                     'summary': classification['summary'],
                     'body': body,
+                    'raw-html': page['raw_html'],
                     'date-last-scraped': time.time(),
                 })
 
                 # save processed post to /websites
-                website_post_ref = websites_ref.child(website).child('posts').child(hashed_page_url)
-                website_post_ref.set({
-                    'url': page_url,
-                    'raw-html': page['raw-html'],
-                })
+                websites_ref.child(website).child('posts').child(hashed_page_url).set(True)
                 num_posts += 1
             else:
                 # save to /websites

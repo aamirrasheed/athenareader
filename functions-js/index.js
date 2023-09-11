@@ -42,18 +42,21 @@ exports.addSubscription = functions.https.onCall(async (data, context) => {
         }
         // this should be the fully formed corect URL
         else {
+            console.log("fully formed website is:", res)
             return res;
         }
     })
     .then(async (website) => {
         // encode website 
         const encodedWebsite = encodeURLforRTDB(website);
+        console.log("encodedWebsite is:", encodedWebsite)
 
         // check if website exists in database
-        await admin.database().ref(`websites/${encodedWebsite}`).once("value", async (snapshot) => {
-            
+        await admin.database().ref(`websites/${encodedWebsite}`).limitToFirst(1).once("value", async (snapshot) => {
+
             // if website doesn't exist, go scrape it in the background
             if (!snapshot.exists()) {
+                console.log("Website " + encodedWebsite + " doesn't exist in database. Scraping it in the background")
 
                 let scrapeWebsiteURL;
                 console.log("process.env.FUNCTIONS_EMULATOR set to ", process.env.FUNCTIONS_EMULATOR)
