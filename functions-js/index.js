@@ -1,6 +1,3 @@
-const http = require('http');
-const https = require('https');
-
 // The Cloud Functions for Firebase SDK to create Cloud Functions and set up triggers.
 const functions = require('firebase-functions/v1');
 
@@ -10,12 +7,14 @@ admin.initializeApp();
 
 const axios = require('axios');
 
-import { Resend } from 'resend';
+const Resend = require('resend').Resend;
+
 
 const {
     encodeURLforRTDB,
     getValidURL,
     weightedRandom,
+    assembleNSummarizedLinksEmail,
     INVALID_URL_ERROR,
     UNABLE_TO_CALL_FUNCTION_ERROR
 } = require('./utils');
@@ -52,6 +51,7 @@ exports.addSubscription = functions.https.onCall(async (data, context) => {
 
         // check if website exists in database
         await admin.database().ref(`websites/${encodedWebsite}`).once("value", async (snapshot) => {
+            
             // if website doesn't exist, go scrape it in the background
             if (!snapshot.exists()) {
 
@@ -107,136 +107,137 @@ Input:
 Output:
 
 */
-// exports.sendEmailAsSummarizedLinks = functions.runWith({secrets: ["RESEND_EMAIL_API_KEY"]}).https.onRequest((req, res) => {
+exports.sendEmailAsSummarizedLinks = functions.https.onRequest((req, res) => {
+    console.log("Entering sendEmailAsSummarizedLinks")
+    const resend = new Resend("re_j4SQCzdZ_H3ykgopQjksBMy9gkmf8LwgU");
+    const NUM_POSTS_PER_EMAIL = 3
 
-//     const resend = new Resend(process.env.RESEND_EMAIL_API_KEY);
-//     const NUM_POSTS_PER_EMAIL = 3
+    // Loop over all users
+    admin.database().ref('users').once('value').then(snapshot => {
+        const promises = [];
+        snapshot.forEach(userSnapshot => {
+            
+            const userUid = userSnapshot.key;
+            console.log("userUid: ", userUid)
+            promises.push(
 
-//     // Loop over all users
-//     admin.database().ref('users').once('value').then(snapshot => {
-//         const promises = [];
-//         snapshot.forEach(userSnapshot => {
-//             const userUid = userSnapshot.key;
-//             promises.push(
-//                 // Step 1: Get three posts the user hasn't read
-//                 // Get the websites the user has subscribed to, pick a random one
-//                 admin.database().ref(`users/${userUid}/subscriptions`).once('value').then(subscriptionSnapshot => {
-//                     const subscriptions = subscriptionSnapshot.val();
-//                     const hashedSubscriptionUrls = Object.keys(subscriptions);
+                // Step 1: Get up to NUM_POSTS_PER_EMAIL random user subscriptions
+                admin.database().ref(`users/${userUid}/subscriptions`).once('value').then(subscriptionSnapshot => {
+                    const subscriptions = subscriptionSnapshot.val();
+                    if (!subscriptions) {
+                        throw new Error('User has no subscriptions');
+                    }
+                    const hashedSubscriptionUrls = Object.keys(subscriptions);
+                    console.log("User has subscriptions: ", hashedSubscriptionUrls)
 
 
-//                     // if user has no subscriptions, throw an error to break this promise chain
-//                     if (hashedSubscriptionUrls.length === 0) {
-//                         throw new Error('User has no subscriptions');
-//                     }
-
-//                     // Randomize the order of the subscriptions
-//                     for(let i = hashedSubscriptionUrls.length - 1; i > 0; i--){
-//                         const j = Math.floor(Math.random() * i)
-//                         const temp = hashedSubscriptionUrls[i];
-//                         hashedSubscriptionUrls[i] = hashedSubscriptionUrls[j];
-//                         hashedSubscriptionUrls[j] = temp;
-//                     }
+                    // Randomize the order of the subscriptions
+                    for(let i = hashedSubscriptionUrls.length - 1; i > 0; i--){
+                        const j = Math.floor(Math.random() * i)
+                        const temp = hashedSubscriptionUrls[i];
+                        hashedSubscriptionUrls[i] = hashedSubscriptionUrls[j];
+                        hashedSubscriptionUrls[j] = temp;
+                    }
                     
-//                     // Get posts from the users subscriptions
-//                     let promises = [];
-//                     let selectedHashedPostUrls = [];
-//                     let postsFromSelectedSubscriptions = {};
+                    // get up to NUM_POSTS_PER_EMAIL subscriptions
+                    let selectedSubscriptions = hashedSubscriptionUrls;
+                    if (hashedSubscriptionUrls.length > NUM_POSTS_PER_EMAIL) {
+                        selectedSubscriptions = hashedSubscriptionUrls.slice(0, NUM_POSTS_PER_EMAIL);
+                    }
+                    console.log("Selected subscriptions: ", selectedSubscriptions)
 
-//                     // Randomly select up to NUM_POSTS_PER_EMAIL subscriptions
-//                     let selectedSubscriptions = hashedSubscriptionUrls;
-//                     if (hashedSubscriptionUrls.length > NUM_POSTS_PER_EMAIL) {
-//                         // hashedSubscriptionUrls is already randomized, just get the first NUM_POSTS_PER_EMAIL
-//                         selectedSubscriptions = hashedSubscriptionUrls.slice(0, NUM_POSTS_PER_EMAIL);
-//                     }
-
-//                     // Gather all posts from selected subscriptions
-//                     for(let i = 0; i < selectedSubscriptions.length; i++) {
-//                         let promise = admin.database().ref(`websites/${selectedSubscriptions[i]}/posts`).once('value')
-//                         .then(postsSnapshot => {
-//                             const posts = postsSnapshot.val();
-//                             let hashedPostUrls = Object.keys(posts);
+                    // Step 2: Gather posts from those subscriptions and weight them such that each website is equally likely to be chosen,
+                    // and each post within a website is equally likely to be chosen
+                    let postsFromSelectedSubscriptions = {};
+                    let promises = selectedSubscriptions.forEach(selectedSubscription => {
+                        return admin.database().ref(`websites/${selectedSubscription}/posts`).once('value')
+                        .then(postsSnapshot => {
+                            const posts = postsSnapshot.val();
+                            if (!posts) {
+                                // user subscription has no posts
+                                return
+                            }
+                            let hashedPostUrls = Object.keys(posts);
                             
-//                             // this is the weighted probability of each post. We're basically weighting it so that
-//                             // each WEBSITE is equally likely to have a post selected, but each POST is equally likely
-//                             // within the WEBSITE
-//                             let eachPostProbability = 1 / selectedSubscriptions.length / hashedPostUrls.length;
+                            // this is the weighted probability of each post. We're basically weighting it so that
+                            // each WEBSITE is equally likely to have a post selected, but each POST is equally likely
+                            // within the WEBSITE
+                            let eachPostProbability = 1 / selectedSubscriptions.length / hashedPostUrls.length;
 
-//                             // fill postsFromSelectedSubscriptions with hashedPostUrls as keys and eachPostProbability as each value
-//                             hashedPostUrls.forEach(hashedPostUrl => {
-//                                 postsFromSelectedSubscriptions[hashedPostUrl] = eachPostProbability;
-//                             });
+                            // fill postsFromSelectedSubscriptions with hashedPostUrls as keys and eachPostProbability as each value
+                            hashedPostUrls.forEach(hashedPostUrl => {
+                                postsFromSelectedSubscriptions[hashedPostUrl] = eachPostProbability;
+                            });
+                        });
+                    })
 
-//                         });
+                    // Step 3: Make a selection of NUM_POSTS_PER_EMAIL posts
+                    return Promise.all(promises).then(() => {
 
-//                         // Add the promise to the array
-//                         promises.push(promise);
-//                     }
+                        let selectedHashedPostUrls = [];
+                        for(let i = 0; i < NUM_POSTS_PER_EMAIL; i++) {
 
-//                     // After all promises have resolved, select NUM_POSTS_PER_EMAIL posts from allPosts
-//                     return Promise.all(promises).then(() => {
+                            // select a random post according to its probability
+                            const selectedPost = weightedRandom(postsFromSelectedSubscriptions);
+                            selectedHashedPostUrls.push(selectedPost);
 
-//                         for(let i = 0; i < NUM_POSTS_PER_EMAIL; i++) {
-//                             if (postsFromSelectedSubscriptions.length === 0) {
-//                                 break;
-//                             }
-//                             const randomIndex = Math.floor(Math.random() * allPosts.length);
-//                             const selectedPost = allPosts[randomIndex];
-//                             // Remove the selected post from allPosts
-//                             allPosts = allPosts.filter(url => url !== selectedPost);
-//                             // Add the selected post to the selectedHashedPostUrls array
-//                             selectedHashedPostUrls.push(selectedPost);
-//                         }
-//                     });
+                            // Remove the selected post and break if there are no posts left
+                            postsFromSelectedSubscriptions = postsFromSelectedSubscriptions.filter(url => url !== selectedPost);
+                            if (postsFromSelectedSubscriptions.length === 0) {
+                                break;
+                            }
+                        }
+                        console.log("Chosen posts: ", selectedHashedPostUrls)
+                        return selectedHashedPostUrls
+                    });
 
-//                 })
-//                 // get a random post from that website
-//                 .then(postsSnapshots => {
-//                     const posts = postsSnapshot.val();
-//                     const postUrls = Object.keys(posts);
-//                     const randomPostUrl = postUrls[Math.floor(Math.random() * postUrls.length)];
-//                     return admin.database().ref(`posts/${randomPostUrl}`).once('value');
-//                 })
-//                 // send the email with the post data
-//                 .then(async postSnapshot => {
-//                     const postData = postSnapshot.val();
-//                     const postTitle = postData.title;
-//                     const postBody = postData.body;
-//                     const postDate = postData.date;
+                })
+                // Step 4: Get data for the selected posts
+                .then(selectedHashedPostUrls => {
+                    let promises = selectedHashedPostUrls.map(hashedPostUrl => {
+                        return admin.database().ref(`posts/${hashedPostUrl}`).once('value');
+                    });
+                    return Promise.all(promises);
+                })
+                // Step 5: send the email with the post data
+                .then(postSnapshots => {
+                    const emailBody = assembleNSummarizedLinksEmail(postSnapshots);
 
-//                     try {
-//                         const data = {
-//                             from: 'Aamir <newsletter@sendittomy.email>',
-//                             to: [userSnapshot.val().email],
-//                             subject: postTitle,
-//                             html: '<h1>' + postTitle + '</h1>' + '<h3>' + postDate + '</h3>' + '<p>' + postBody + '</p>'
-//                         }
-//                         return await resend.emails.send(data)
-//                     } 
-//                     catch {
-//                         throw new Error('Failed to send email via Resend')
-//                     }
+                    const data = {
+                        from: 'Aamir <newsletter@sendittomy.email>',
+                        to: [userSnapshot.val().email],
+                        subject: "Your Daily Newsletter",
+                        html: emailBody
+                    }
+                    return resend.emails.send(data).then(resendData => {
+                        console.log("Email sent. Resend data: ", resendData)
+                        return {
+                            "user-emailed": userUid,
+                            "email-body": emailBody,
+                            "posts": postSnapshots.reduce((acc, curr) => {
+                                acc[curr.key] = curr.val()?.url;
+                                return acc;
+                            }, {})
+                        }
+                    })
 
-//                 })
-//                 // record the email in sent_emails
-//                 .then(resendData => {
-//                     console.log(resendData);
-//                     return admin.database().ref(`sent_emails/${resendData.id}`).set({
-//                         userEmailed: userUid,
-//                         post: resendData.id,
-//                         date: new Date().toISOString()
-//                     })
-//                 })
-//                 .catch(error => {
-//                     // most likely just a user with no subscriptions
-//                     console.error(error);
-//                 })
-//             );
-//         });
-//         return Promise.all(promises);
-//     })
-//     .catch(error => {
-//         console.error(error);
-//     });
+                })
+                // record the email in sent_emails
+                .then(emailData => {
+                    return admin.database().ref('sent_emails').push().set(emailData)
+                })
+                .catch(error => {
+                    // most likely just a user with no subscriptions
+                    console.error(error);
+                })
+            );
+        });
+        return Promise.all(promises);
+    })
+    .catch(error => {
+        console.error(error);
+    });
 
-// })
+    return {result: "success"}
+
+})
