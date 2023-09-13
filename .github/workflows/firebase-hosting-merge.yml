@@ -21,3 +21,5 @@ jobs:
           firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_SENDITTOMYEMAIL_4C3CA }}'
           channelId: live
           projectId: sendittomyemail-4c3ca
+        env:
+          FIREBASE_CLI_EXPERIMENTS: webframeworks
