@@ -9,3 +9,4 @@ node_modules
 *.log
 ui-debug.log
 database.json
+**/__pycache__/**
