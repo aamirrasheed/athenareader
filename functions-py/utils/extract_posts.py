@@ -6,6 +6,8 @@ import hashlib
 from . import prompts
 
 def classify_page(url, body):
+    if 'wp-json' in url:
+        return {"blogpost": "no"}
     print("classify_page called with url:", url)
     prompt = prompts.BLOGPOST_CLASSIFICATION_AND_EXTRACT_TITLE_DATE
     enc = tiktoken.encoding_for_model("gpt-3.5-turbo") 
