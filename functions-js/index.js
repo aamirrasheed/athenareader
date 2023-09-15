@@ -207,7 +207,7 @@ exports.sendEmailAsSummarizedLinks = functions.https.onRequest((req, res) => {
                     const emailBody = assembleNSummarizedLinksEmail(postSnapshots);
 
                     const data = {
-                        from: 'Aamir <newsletter@sendittomy.email>',
+                        from: 'Your Daily Newsletter <newsletter@sendittomy.email>',
                         to: [userSnapshot.val().email],
                         subject: "Your Daily Newsletter",
                         html: emailBody
@@ -217,6 +217,7 @@ exports.sendEmailAsSummarizedLinks = functions.https.onRequest((req, res) => {
                         return {
                             "user-emailed": userUid,
                             "email-body": emailBody,
+                            "timestamp": Math.floor(Date.now() / 1000),
                             "posts": postSnapshots.reduce((acc, curr) => {
                                 acc[curr.key] = curr.val()?.url;
                                 return acc;

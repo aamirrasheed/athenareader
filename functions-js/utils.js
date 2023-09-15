@@ -92,11 +92,45 @@ function getValidURL(given_url) {
         
 }
 
+function formatDate(dateString){
+    let [day, month, year] = dateString.split('-').map(part => part === "" ? undefined : parseInt(part));
+
+    // If day, month, and year are known
+    if (day && month && year) {
+        let date = new Date(year, month - 1, day);
+        return format(date, 'MMMM do, yyyy');
+    }
+    // If day and month are known but not year
+    else if (day && month && !year) {
+        let date = new Date(2000, month - 1, day); // Year doesn't matter here
+        return format(date, 'MMMM do');
+    }
+    // If month and year are known
+    else if (!day && month && year) {
+        let date = new Date(year, month - 1);
+        return format(date, 'MMMM yyyy');
+    }
+    // month and year not known
+    else {
+        console.log(`Unable to format date ${dateString} in assembleNSummarizedLinksEmail`)
+        return "";
+    }
+}
+
 function assembleNSummarizedLinksEmail (postSnapshots) {
     body = ""
     postSnapshots.forEach(postSnapshot => {
         const post = postSnapshot.val();
+        let dateString = post['date-published']
+        try{
+            dateString = formatDate(post['date-published'])
+        }
+        catch(e){
+            console.log(e)
+        }
+
         body += `<h2>${post.title}</h2>`;
+        body += `<h4>${dateString}</h4>`;
         body += `<p>${post.summary}</p>`;
         body += `<a href="${post.url}">${post.url}</a>`;
     })
