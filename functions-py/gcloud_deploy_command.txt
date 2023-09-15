@@ -6,3 +6,6 @@ gcloud functions deploy processWebsitePages --gen2 --runtime=python311 --region=
 
 // cloud scheduler job for processWebsitePages
 gcloud scheduler jobs create http processWebsitePagesJob --schedule="*/30 * * * *" --http-method=GET --location=us-central1 --uri=https://us-central1-sendittomyemail-4c3ca.cloudfunctions.net/processWebsitePages
+
+// cloud scheduler job for sendEmailAsSummarizedLinks
+gcloud scheduler jobs create http sendEmailsJob --schedule="0 8 * * *" --http-method=GET --location=us-central1 --uri=https://us-central1-your-project-id.cloudfunctions.net/sendEmailAsSummarizedLinks
