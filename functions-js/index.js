@@ -110,7 +110,7 @@ Input:
 Output:
 
 */
-exports.sendEmailAsSummarizedLinks = functions.https.onRequest((req, res) => {
+exports.sendEmailAsSummarizedLinks = functions.pubsub.schedule('0 8 * * *').timeZone('America/Los_Angeles').onRun((context) => {
     console.log("Entering sendEmailAsSummarizedLinks")
     const resend = new Resend("re_j4SQCzdZ_H3ykgopQjksBMy9gkmf8LwgU");
     const NUM_POSTS_PER_EMAIL = 3
