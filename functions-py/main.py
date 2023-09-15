@@ -7,8 +7,12 @@ import base64
 from tiktoken import encoding_for_model
 
 from firebase_admin import db
+from firebase_admin import storage
 from firebase_admin import initialize_app
-initialize_app(options={'databaseURL': 'https://sendittomyemail-4c3ca-default-rtdb.firebaseio.com'})
+initialize_app(options={
+    'databaseURL': 'https://sendittomyemail-4c3ca-default-rtdb.firebaseio.com',
+    'storageBucket': 'sendittomyemail-4c3ca.appspot.com'
+})
 
 import functions_framework
 
@@ -90,7 +94,17 @@ def extractPagesFromWebsite(req):
                 encoded_page_url = extract_posts.encode_url_for_rtdb(url)
                 page_ref = website_ref.child('unprocessed-pages').child(encoded_page_url)
                 page_ref.child("url").set(url)
-                page_ref.child("raw-html").set(response.text)
+                
+                # write URL to storage
+                bucket = storage.bucket()
+                blob = bucket.blob('webpages/' + encoded_page_url + '/raw-html')
+                try:
+                    blob.upload_from_string(response.text)
+                except Exception as e:
+                    print(f"Failed to upload raw HTML for {url}. Error: {type(e).__name__} - {e}")
+                    return 
+
+                page_ref.child("raw-html").set(blob.name)
 
                 # counter for debugging purposes
                 nonlocal num_pages
@@ -125,6 +139,10 @@ def extractPagesFromWebsite(req):
                     # for each link in new_hrefs, let's recurisvely explore it to see if there are more pages to find
                     for href in new_hrefs:
                         new_existing_hrefs = extract_links(href, existing_hrefs, max_depth, depth + 1)
+
+                        # error - stop execution
+                        if new_existing_hrefs is None:
+                            return None
 
                         # add any new links found in the recursive call to the existing_hrefs set
                         existing_hrefs = existing_hrefs.union(new_existing_hrefs)
@@ -226,14 +244,24 @@ def processWebsitePages(req):
         website_url = websites_ref.child(website).child('url').get()
         num_pages = 0
         num_posts = 0
-
+        if unprocessed_pages is None:
+            print("No unprocessed pages for", website_url)
+            continue
         for unprocessed_page in unprocessed_pages:
 
             # Step 3: get data from unprocessed page
             page_ref = unprocessed_pages_ref.child(unprocessed_page)
             page = page_ref.get()
             page_url = page['url']
-            body = BeautifulSoup(page['raw-html'], 'html.parser').get_text() 
+            # get raw html from cloud storage
+            bucket = storage.bucket()
+            blob = bucket.blob('webpages/' + unprocessed_page + '/raw-html')
+            try:
+                raw_html = blob.download_as_string().decode('utf-8')
+            except Exception as e:
+                print(f"Failed to download raw HTML for {page_url}. Error: {type(e).__name__} - {e}")
+                continue
+            body = BeautifulSoup(raw_html, 'html.parser').get_text() 
 
             # Step 4: classify page
             # OpenAI has unpredictable timeouts, so we'll try 3 times before giving up
@@ -282,7 +310,26 @@ def processWebsitePages(req):
 
             # Step 7: save the classification to Realtime Database
             hashed_page_url = extract_posts.encode_url_for_rtdb(page_url)
+
+            # save raw html to cloud storage
+            bucket = storage.bucket()
+            raw_html_blob = bucket.blob('webpages/' + hashed_page_url + '/raw-html')
+            try:
+                raw_html_blob.upload_from_string(page['raw-html'])
+            except Exception as e:
+                print(f"Failed to upload raw HTML for {page_url}. Error: {type(e).__name__} - {e}")
+                continue
+
             if classification['blogpost'] == 'yes':
+                # save post body to cloud storage
+                bucket = storage.bucket()
+                body_blob = bucket.blob('webpages/' + hashed_page_url + '/body')
+                try:
+                    body_blob.upload_from_string(body)
+                except Exception as e:
+                    print(f"Failed to upload body for {page_url}. Error: {type(e).__name__} - {e}")
+                    continue
+
                 # save to /posts
                 post_ref = db.reference('/').child('posts').child(hashed_page_url)
                 post_ref.set({
@@ -290,8 +337,8 @@ def processWebsitePages(req):
                     'title': classification['title'],
                     'date-published': classification['date'],
                     'summary': classification['summary'],
-                    'body': body,
-                    'raw-html': page['raw-html'],
+                    'body': body_blob.name,
+                    'raw-html': raw_html_blob.name,
                     'date-last-scraped': time.time(),
                 })
 
@@ -303,7 +350,7 @@ def processWebsitePages(req):
                 not_post_ref = websites_ref.child(website).child('not-posts').child(hashed_page_url)
                 not_post_ref.set({
                     'url': page_url,
-                    'raw-html': page['raw-html'],
+                    'raw-html': raw_html_blob.name,
                 })
             
             # Step 8: Update the date-last-scraped for this website
