@@ -29,7 +29,8 @@ import {
 } from "firebase/functions";
 
 import {
-    getAnalytics
+    getAnalytics,
+    isSupported
 } from "firebase/analytics";
 
 const firebaseConfig = {
@@ -46,7 +47,7 @@ const firebaseConfig = {
 let firebaseAuth;
 let firebaseDb;
 let firebaseFunctions;
-let firebaseAnalytics
+let firebaseAnalytics;
 
 if (!getApps().length) {
     const firebaseApp = initializeApp(firebaseConfig);
@@ -62,7 +63,7 @@ if (!getApps().length) {
     firebaseFunctions = getFunctions(firebaseApp);
 
     // initialize analytics
-    firebaseAnalytics = getAnalytics(firebaseApp);
+    if(isSupported()) firebaseAnalytics = getAnalytics(firebaseApp);
 
     // connect to firebase emulators while developing
     if (process.env.NODE_ENV === 'development') {
