@@ -54,30 +54,30 @@ if posts:
         body_ref_list[post] = body_ref
         raw_html_ref_list[post] = raw_html_ref
 
-# get refs from /websites
-websites_ref = db.reference('websites')
-websites = websites_ref.get(shallow=True)
-for website in websites:
-    # get refs from websites/<hashed-url>/unprocessed-pages
-    unprocessed_pages_ref = websites_ref.child(website).child('unprocessed-pages')
-    unprocessed_pages = unprocessed_pages_ref.get(shallow=True)
-    if unprocessed_pages:
-        for unprocessed_page in unprocessed_pages:
-            raw_html_ref = unprocessed_pages_ref.child(unprocessed_page).child('raw-html')
-            raw_html_ref_list[unprocessed_page] = raw_html_ref
+# # get refs from /websites
+# websites_ref = db.reference('websites')
+# websites = websites_ref.get(shallow=True)
+# for website in websites:
+#     # get refs from websites/<hashed-url>/unprocessed-pages
+#     unprocessed_pages_ref = websites_ref.child(website).child('unprocessed-pages')
+#     unprocessed_pages = unprocessed_pages_ref.get(shallow=True)
+#     if unprocessed_pages:
+#         for unprocessed_page in unprocessed_pages:
+#             raw_html_ref = unprocessed_pages_ref.child(unprocessed_page).child('raw-html')
+#             raw_html_ref_list[unprocessed_page] = raw_html_ref
 
-    # get refs from websites/<hashed-url>/not-posts
-    not_posts_ref = websites_ref.child(website).child('not-posts')
-    not_posts = not_posts_ref.get(shallow=True)
-    if not_posts:
-        for not_post in not_posts:
-            raw_html_ref = not_posts_ref.child(not_post).child('raw-html')
-            raw_html_ref_list[not_post] = raw_html_ref
-
+#     # get refs from websites/<hashed-url>/not-posts
+#     not_posts_ref = websites_ref.child(website).child('not-posts')
+#     not_posts = not_posts_ref.get(shallow=True)
+#     if not_posts:
+#         for not_post in not_posts:
+#             raw_html_ref = not_posts_ref.child(not_post).child('raw-html')
+#             raw_html_ref_list[not_post] = raw_html_ref
 # Step 2: For each ref - download data from RTD, upload the data to cloud storage, then change RTD to point to cloud storage
 for i, hashed_url in zip(range(len(raw_html_ref_list)), raw_html_ref_list):
     # get data from RTD
     data = raw_html_ref_list[hashed_url].get()
+    print(hashed_url)
 
     # upload the data there to cloud storage
     bucket = storage.bucket()
@@ -87,7 +87,7 @@ for i, hashed_url in zip(range(len(raw_html_ref_list)), raw_html_ref_list):
     # change RTD to point to cloud storage
     raw_html_ref_list[hashed_url].set(blob.name)
     print('Uploaded webpage ' + str(i) + ' of ' + str(len(raw_html_ref_list)))
-
+quit()
 # Step 3: Repeat step 2 for body_ref_list
 for i, hashed_url in zip(range(len(body_ref_list)), body_ref_list):
     # get data from RTD
