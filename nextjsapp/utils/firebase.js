@@ -28,6 +28,10 @@ import {
     connectFunctionsEmulator
 } from "firebase/functions";
 
+import {
+    getAnalytics
+} from "firebase/analytics";
+
 const firebaseConfig = {
   apiKey: "AIzaSyAhEQFLIgWUrs_lsxQEZcHnzq6IWCPTy7w",
   authDomain: "sendittomyemail-4c3ca.firebaseapp.com",
@@ -42,6 +46,7 @@ const firebaseConfig = {
 let firebaseAuth;
 let firebaseDb;
 let firebaseFunctions;
+let firebaseAnalytics
 
 if (!getApps().length) {
     const firebaseApp = initializeApp(firebaseConfig);
@@ -53,7 +58,11 @@ if (!getApps().length) {
     // initialize realtime database
     firebaseDb = getDatabase(firebaseApp)
 
+    // initialize functions
     firebaseFunctions = getFunctions(firebaseApp);
+
+    // initialize analytics
+    firebaseAnalytics = getAnalytics(firebaseApp);
 
     // connect to firebase emulators while developing
     if (process.env.NODE_ENV === 'development') {
