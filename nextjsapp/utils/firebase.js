@@ -63,7 +63,9 @@ if (!getApps().length) {
     firebaseFunctions = getFunctions(firebaseApp);
 
     // initialize analytics
-    if(isSupported()) firebaseAnalytics = getAnalytics(firebaseApp);
+    if(typeof window !== 'undefined' && isSupported()){
+        firebaseAnalytics = getAnalytics(firebaseApp);
+    }
 
     // connect to firebase emulators while developing
     if (process.env.NODE_ENV === 'development') {
