@@ -1,24 +1,8 @@
 export type SiteConfig = typeof siteConfig;
 
 export const siteConfig = {
-	name: "SITME",
+	name: "sendittomy.email",
 	description: "Subscribe to anything on the internet.",
 	navItems: [
-        {
-        label: "Docs",
-        href: "/docs",
-        },
-        {
-        label: "Pricing",
-        href: "/pricing",
-        },
-        {
-        label: "Blog",
-        href: "/blog",
-        },
-        {
-        label: "About",
-        href: "/about",
-        }
 	]
 };

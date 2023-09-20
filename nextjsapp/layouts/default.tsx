@@ -2,7 +2,7 @@ import { Navbar } from "@/components/navbar";
 import { Head } from "./head";
 
 export default function DefaultLayout({
-	children,
+    children,
 }: {
 	children: React.ReactNode;
 }) {
