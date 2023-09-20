@@ -56,7 +56,7 @@ export default function SignUp () {
 
     return (
         <div className="flex flex-col items-center justify-center">
-            <div className="flex flex-col mt-4 w-1/3 gap-10">
+            <div className="flex flex-col mt-4 w-full md:w-1/2 lg:w-1/3 gap-10">
                 <Card>
                     <CardBody>
                         { emailSent ? <h1>Check your email!</h1> :

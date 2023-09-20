@@ -81,7 +81,7 @@ function App() {
     return(
         <div className="flex flex-col items-center justify-center">
             {loading ? <Spinner/> : 
-                <div className="flex flex-col mt-4 w-1/3 gap-10">
+                <div className="flex flex-col mt-4 w-full md:w-1/2 lg:w-1/3 gap-10">
                     <Card>
                         <CardHeader>
                             <p className="text-2xl">User Info</p>

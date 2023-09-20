@@ -72,8 +72,11 @@ export default function FinishLogin() {
         signUserIn()
     }
 
-    return pageState === PAGE_STATE.LOADED ?
-                <div>
+    return (
+        <div className="flex justify-center items-center mt-20">
+            {pageState === PAGE_STATE.LOADED ?
+                <div className="text-center">
+                    <p>Click the button to finish signing in</p>
                     <Button onClick={handleLogIn}>Log in</Button>
                 </div>
             :
@@ -91,5 +94,7 @@ export default function FinishLogin() {
                 <div>
                     <h1>Success! Redirecting to app...</h1>
                 </div> 
-            : <div>Error - this shouldn't show up.</div>
+            : <div>Error - this shouldn't show up.</div>}
+        </div>
+    )
 }

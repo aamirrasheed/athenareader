@@ -62,7 +62,7 @@ function Feature() {
                 href="/login"
                 as={Link}
             >
-                I want a better information diet
+                I want a better info diet
             </Button>
           </div>
         </section>
