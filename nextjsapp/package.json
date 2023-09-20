@@ -22,6 +22,7 @@
     "firebase-functions": "^4.4.1",
     "framer-motion": "^10.12.20",
     "intl-messageformat": "^10.1.0",
+    "mixpanel": "^0.18.0",
     "next": "^13.4.9",
     "next-themes": "^0.2.1",
     "postcss": "8.4.24",

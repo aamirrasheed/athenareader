@@ -19,3 +19,15 @@ export default function IndexPage() {
 		</LayoutAlternate>
 	);
 }
+
+import mixpanel from "@/utils/mixpanel"
+
+// Mixpanel analytics
+export async function getServerSideProps({ context }) {
+    mixpanel.track('Homepage Visited', {
+        page: context.req.url
+    });
+    return {
+        props: {}
+    }
+}
