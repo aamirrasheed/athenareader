@@ -89,6 +89,7 @@ function App() {
                         <Divider/>
                         <CardBody>
                             <p>Your email is {authUser() ? authUser().email : 'unknown'}.</p>
+                            <p>You're receiving email daily.</p>
                             <Spacer y={4}/>
                             <Button
                                 onClick={doSignOut}
