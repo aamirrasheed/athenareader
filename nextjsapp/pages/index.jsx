@@ -23,9 +23,13 @@ export default function IndexPage() {
 import mixpanel from "@/utils/mixpanel"
 
 // Mixpanel analytics
-export async function getServerSideProps({ context }) {
+export async function getServerSideProps({ req }) {
+    console.log(
+        "getServerSideProps called with req.url: ",
+        req.url
+    )
     mixpanel.track('Homepage Visited', {
-        page: context.req.url
+        page: req.url
     });
     return {
         props: {}
