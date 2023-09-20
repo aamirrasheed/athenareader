@@ -10,17 +10,17 @@ function Testimonials() {
         <p className="lg:w-2/3 mx-auto leading-relaxed text-base">Hear from people enjoying sendittomy.email!</p>
       </div>
       <div className="flex flex-wrap -m-4">
-        <div className="lg:w-1/3 sm:w-1/2 p-4">
+        <div className="lg:w-1/3 sm:w-1/2 w-full p-4">
           <div className="flex relative h-64">
             <img alt="gallery" className="absolute inset-0 w-full h-full object-contain object-center" src={TestimonialImage1}/>
           </div>
         </div>
-        <div className="lg:w-1/3 sm:w-1/2 p-4">
+        <div className="lg:w-1/3 sm:w-1/2 w-full p-4">
           <div className="flex relative h-64">
             <img alt="gallery" className="absolute inset-0 w-full h-full object-contain object-center" src={TestimonialImage2}/>
           </div>
         </div>
-        <div className="lg:w-1/3 sm:w-1/2 p-4">
+        <div className="lg:w-1/3 sm:w-1/2 w-full p-4">
           <div className="flex relative h-64">
             <img alt="gallery" className="absolute inset-0 w-full h-full object-contain object-center" src={TestimonialImage3}/>
           </div>
