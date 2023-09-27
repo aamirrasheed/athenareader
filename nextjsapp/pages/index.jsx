@@ -22,21 +22,21 @@ export default function IndexPage() {
 	);
 }
 
-import mixpanel from "@/utils/mixpanel"
+// import mixpanel from "@/utils/mixpanel"
 
-// Mixpanel analytics
-export async function getServerSideProps({ req }) {
-    console.log(
-        "getServerSideProps called with req.url: ",
-        req.url
-    )
-    const {query} = parse(req.url, true)
-    const source = query.source || req.headers.referer || 'direct';
-    mixpanel.track('Homepage Visited', {
-        page: req.url,
-        source: source
-    });
-    return {
-        props: {}
-    }
-}
+// // Mixpanel analytics
+// export async function getServerSideProps({ req }) {
+//     console.log(
+//         "getServerSideProps called with req.url: ",
+//         req.url
+//     )
+//     const {query} = parse(req.url, true)
+//     const source = query.source || req.headers.referer || 'direct';
+//     mixpanel.track('Homepage Visited', {
+//         page: req.url,
+//         source: source
+//     });
+//     return {
+//         props: {}
+//     }
+// }
