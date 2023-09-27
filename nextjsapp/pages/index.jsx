@@ -7,6 +7,8 @@ import Feature from '@/components/feature';
 import HowItWorks from '@/components/howItWorks';
 import YoutubeEmbed from '@/components/youtubeEmbed';
 
+import {parse} from 'url';
+
 export default function IndexPage() {
 
 	return (
@@ -28,8 +30,11 @@ export async function getServerSideProps({ req }) {
         "getServerSideProps called with req.url: ",
         req.url
     )
+    const {query} = parse(req.url, true)
+    const source = query.source || req.headers.referer || 'direct';
     mixpanel.track('Homepage Visited', {
-        page: req.url
+        page: req.url,
+        source: source
     });
     return {
         props: {}
