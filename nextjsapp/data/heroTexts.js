@@ -7,7 +7,7 @@ export const titles = [
 
 export const subtitles = [
     "Get historical posts from any blog straight to your inbox",
-    "Stop bookmarking or binging the blogs of your favorite writers. Get those posts delivered over time to your email instead.",
+    "Stop bookmarking or binging the blogs of your favorite writers. Get all of their posts delivered over time to your email instead.",
     "Hey, I'm Aamir. I built this to get the best posts from my favorite blogs delivered to my inbox. I hope you like it too.",
     "The best writers of our generation have posted for years on their blogs. Get it delivered to your inbox",
     "Subscribe to any blog. Get current and past posts delivered to your inbox daily.",
