@@ -8,20 +8,6 @@ import HowItWorks from '@/components/howItWorks';
 import YoutubeEmbed from '@/components/youtubeEmbed';
 
 import {parse} from 'url';
-
-export default function IndexPage() {
-
-	return (
-		<LayoutAlternate>
-            <HeroAlternate />
-            <HowItWorks />
-            <YoutubeEmbed />
-            <Feature />
-            <Testimonials />
-		</LayoutAlternate>
-	);
-}
-
 // import mixpanel from "@/utils/mixpanel"
 
 // // Mixpanel analytics
@@ -41,3 +27,17 @@ export default function IndexPage() {
 //     }
 // }
 // extra whitespace
+
+export default function IndexPage() {
+
+	return (
+		<LayoutAlternate>
+            <HeroAlternate />
+            <HowItWorks />
+            <YoutubeEmbed />
+            <Feature />
+            <Testimonials />
+		</LayoutAlternate>
+	);
+}
+
