@@ -5,7 +5,7 @@ import { Button, Link } from "@nextui-org/react";
 function HeroAlternate() {
     return ( <section className="">
     <div className="container mx-auto flex px-5 py-24 items-center justify-center flex-col">
-      <div className="text-center lg:w-2/3 w-full">
+      <div className="text-center lg:w-2/3 w-full mt-20 mb-20">
         <h1 className={title({size : "lg"})}>{titles[1]}</h1>
         <p className={subtitle()}>{subtitles[1]}</p>
         <div className="flex justify-center mt-5">

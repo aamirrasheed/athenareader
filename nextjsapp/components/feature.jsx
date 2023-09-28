@@ -4,7 +4,7 @@ function Feature() {
     return (
         <section className="body-font">
           <div className="container px-5 py-24 mx-auto">
-            <h1 className="text-4xl mb-10 font-bold text-center">Why use sendittomy.email?</h1>
+            <h1 className="text-4xl mb-10 font-bold text-center">Why use Athenareader?</h1>
             
             <div className="flex items-center lg:w-3/5 mx-auto border-b pb-10 mb-10 border-gray-200 sm:flex-row flex-col">
               <div className="sm:w-32 sm:h-32 h-20 w-20 sm:mr-10 inline-flex items-center justify-center rounded-full bg-purple-100 text-purple-500 flex-shrink-0">

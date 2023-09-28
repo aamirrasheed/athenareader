@@ -13,21 +13,22 @@ import { siteConfig } from "@/config/site";
 import NextLink from "next/link";
 import clsx from "clsx";
 
-import { Logo } from "@/components/icons";
+import { LogoDarkMode, LogoLightMode } from "@/components/icons";
 import { useRouter } from "next/router";
-
 import { ThemeSwitch } from "./theme-switch";
+
+import {useTheme} from "next-themes"    
 
 export const Navbar = () => {
     const router = useRouter()
-    
+    const {theme} = useTheme()
 	return (
 		<NextUINavbar maxWidth="xl" position="sticky">
 			<NavbarContent className="flex justify-between basis-1/5 sm:basis-full" justify="start">
                 <NavbarBrand className="gap-3 max-w-fit">
                     <NextLink className="flex justify-start items-center gap-1" href="/">
-                        <Logo />
-                        <p className="font-bold text-inherit">sendittomy.email</p>
+                        {theme === 'dark' ? <LogoDarkMode /> : <LogoLightMode />}
+                        <p className="font-bold text-inherit">Athenareader</p>
                     </NextLink>
                 </NavbarBrand>
                 

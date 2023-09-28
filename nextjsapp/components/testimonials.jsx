@@ -7,7 +7,6 @@ function Testimonials() {
     <div className="container px-5 py-10 mx-auto">
       <div className="flex flex-col text-center w-full mb-10">
         <h1 className="text-4xl font-medium title-font mb-4">Still Not Convinced?</h1>
-        <p className="lg:w-2/3 mx-auto leading-relaxed text-base">Hear from people enjoying sendittomy.email!</p>
       </div>
       <div className="flex flex-wrap -m-4">
         <div className="lg:w-1/3 sm:w-1/2 w-full p-4">

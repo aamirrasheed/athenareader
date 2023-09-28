@@ -27,7 +27,7 @@ function HowItWorks() {
                 <div className="flex-grow pl-6 flex sm:items-center items-start flex-col sm:flex-row">
                 
                 <div className="flex-grow sm:pl-6 mt-6 sm:mt-0">
-                    <h2 className="font-medium title-font mb-1 text-xl">sendittomy.email indexes all existing posts.</h2>
+                    <h2 className="font-medium title-font mb-1 text-xl">Athenareader indexes all existing posts.</h2>
                 </div>
                 </div>
             </div>
@@ -38,7 +38,7 @@ function HowItWorks() {
                 <div className="flex-shrink-0 w-8 h-8 rounded-full mt-10 sm:mt-0 inline-flex items-center justify-center bg-purple-500 text-white relative z-10 title-font font-medium text-sm">3</div>
                 <div className="flex-grow pl-6 flex sm:items-center items-start flex-col sm:flex-row">
                 <div className="flex-grow sm:pl-6 mt-6 sm:mt-0">
-                    <h2 className="font-medium title-font  mb-1 text-xl">You receive posts in your inbox.</h2>
+                    <h2 className="font-medium title-font  mb-1 text-xl">Athenareader delivers those posts over time to your inbox.</h2>
                 </div>
                 </div>
             </div>
