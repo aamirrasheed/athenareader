@@ -66,7 +66,7 @@ def extractPagesFromWebsite(req):
     })
     
     # Step 3: Define recursive function to scrape website
-    def scrape_website(website_url, depth_to_scrape=2):
+    def scrape_website(website_url, depth_to_scrape=3):
         num_pages = 0
 
         print("Scraping", website_url, "with depth", depth_to_scrape, "...")

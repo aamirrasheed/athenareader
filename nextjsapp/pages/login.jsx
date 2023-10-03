@@ -10,6 +10,7 @@ import validator from 'validator'
 
 import {
     doSendSignInLinkToEmail,
+    doSendMagicLink
 } from '@/utils/firebase'
 
 export const INITIAL_FORM_STATE = {
@@ -20,7 +21,7 @@ export const EMAIL_ERROR_MSG = "Invalid Email"
 
 export default function SignUp () {
     const [formData, setFormData] = useState({...INITIAL_FORM_STATE})
-
+    const [loading, setLoading] = useState(false)
     const [formErrors, setFormErrors] = useState({...INITIAL_FORM_STATE})
 
     const [emailSent, setEmailSent] = useState(false)
@@ -32,11 +33,13 @@ export default function SignUp () {
          )
     
     const handleSubmit = (e) => {
-        doSendSignInLinkToEmail(formData.email, {
-                url: `${window.location.origin}/finishLogin`,
-                handleCodeInApp: true
-            }
-        )
+        setLoading(true)
+        // doSendSignInLinkToEmail(formData.email, {
+        //         url: `${window.location.origin}/finishLogin`,
+        //         handleCodeInApp: true
+        //     }
+        // )
+        doSendMagicLink(formData.email)
         .then(() => {
             // The link was successfully sent. 
             // Save the email locally so you don't need to ask the user for it again
@@ -51,7 +54,11 @@ export default function SignUp () {
             setFormErrors({
                 emailError: errorMessage
             })
-        });
+        })
+        .finally(() => {
+            setLoading(false)
+        })
+
     }
 
     return (
@@ -84,6 +91,7 @@ export default function SignUp () {
                                 <Button
                                     onClick={handleSubmit}
                                     isDisabled={shallowEquals(formData, INITIAL_FORM_STATE) || !shallowEquals(formErrors, INITIAL_FORM_STATE)}
+                                    isLoading={loading}
                                 >
                                     Log In
                                 </Button>

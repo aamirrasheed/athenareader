@@ -6,6 +6,7 @@ const admin = require("firebase-admin");
 admin.initializeApp();
 
 const axios = require('axios');
+const crypto = require('crypto');
 
 const Resend = require('resend').Resend;
 
@@ -27,6 +28,117 @@ exports.createUserInDatabaseOnSignup = functions.auth.user().onCreate((user, con
 
     return {result: "success"}
 })
+
+exports.sendMagicLink = functions.https.onCall(async (data, context) => {
+    const email = data.email;
+
+    // Validate the email with a regular expression
+    const emailRegex = /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/;
+    if (!email || !emailRegex.test(email)) {
+        throw new functions.https.HttpsError('invalid-argument', 'The email is invalid.');
+    }
+
+    // Generate a unique token
+    const token = crypto.randomBytes(16).toString('hex');
+
+    // Store the token, email, and expiration time in your database
+    const expirationTime = Date.now() + 60 * 60 * 1000; // 1 hour from now
+    await admin.database().ref(`magicLinks/${token}`).set({
+        email: email,
+        createdAt: Date.now(),
+        expiresAt: expirationTime
+    });
+
+    // Send a magic link
+    const resend = new Resend("re_guPE3JGT_Pn4H3Fs9mLWr7bwyznu1Ff64");
+    let magicLink
+    if (process.env.FUNCTIONS_EMULATOR) {
+        magicLink = `http://localhost:3000/finishLogin?token=${token}`;
+    }
+    else {
+        magicLink = `https://athenareader.com/finishLogin?token=${token}`;
+    }
+
+    const emailData = {
+        from: 'Your App <support@athenareader.com>',
+        to: [email],
+        subject: "Sign in to Athenareader",
+        html: `
+            <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+                <h2 style="color: #4a5568;">Hello,</h2>
+                <p style="color: #718096;">You requested to sign in to Athenareader. Please click the button below to continue. If you did not request this, please ignore this email.</p>
+                <a href="${magicLink}" style="background-color: #667eea; color: #ffffff; text-decoration: none; padding: 10px 20px; margin: 20px 0; display: inline-block;">Sign in to Athenareader</a>
+                <p style="color: #718096;">Best,</p>
+                <p style="color: #718096;">The Athenareader Team</p>
+            </div>
+        `
+    };
+
+    try {
+        const data = await resend.emails.send(emailData);
+        console.log("Email sent. Resend data: ", data)
+        return {result: "success"}
+    } catch (error) {
+        throw error
+    }
+
+
+});
+
+exports.verifyMagicLink = functions.https.onCall(async (data, context) => {
+    const token = data.token;
+
+    // Look up the token in your database
+    const snapshot = await admin.database().ref(`magicLinks/${token}`).once('value');
+    const magicLinkData = snapshot.val();
+
+    if (!magicLinkData) {
+        // The token is invalid
+        throw new functions.https.HttpsError('invalid-argument', 'The magic link is invalid.');
+    }
+
+    // Check if the token has expired
+    if (Date.now() > magicLinkData.expiresAt) {
+        throw new functions.https.HttpsError('invalid-argument', 'The magic link has expired.');
+    }
+
+    const email = magicLinkData.email;
+
+    // Create a user account
+    let userRecord;
+    try {
+        userRecord = await admin.auth().getUserByEmail(email);
+    } catch (error) {
+        console.log("error is:", error)
+        if (error.code === 'auth/user-not-found') {
+            // The user account doesn't exist yet, so create it
+            userRecord = await admin.auth().createUser({
+                email: email,
+                emailVerified: true,
+            });
+
+            // Add the user to the database
+            data = await admin.database().ref(`users/${userRecord.uid}`).set({
+                email: email,
+            });
+
+            // print data
+            console.log("create user data is:", data)
+        } else {
+            throw error;
+        }
+    }
+
+    // Generate a custom token
+    const customToken = await admin.auth().createCustomToken(userRecord.uid);
+
+    // Delete the token from the database
+    await admin.database().ref(`magicLinks/${token}`).remove();
+
+    return { customToken };
+});
+
+
 
 // TODO: Add CORS filtering to only allow deployed functions to call this function
 // May need to be done on the google cloud console under "invoker" permissions
@@ -128,7 +240,7 @@ exports.sendEmailAsSummarizedLinks = functions.pubsub.schedule('0 8 * * *').time
                 admin.database().ref(`users/${userUid}/subscriptions`).once('value').then(subscriptionSnapshot => {
                     const subscriptions = subscriptionSnapshot.val();
                     if (!subscriptions) {
-                        throw new Error('User has no subscriptions');
+                        console.log(`User ${userSnapshot.val().email} has no subscriptions. Throwing error and exiting promise chain to next user`);
                     }
                     const hashedSubscriptionUrls = Object.keys(subscriptions);
                     console.log("User has subscriptions: ", hashedSubscriptionUrls)

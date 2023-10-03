@@ -6,6 +6,8 @@ import { Button, Spinner } from "@nextui-org/react";
 import {
     doIsSignInWithEmailLink, 
     doSignInWithEmailLink,
+    doVerifyMagicLink,
+    doSignInWithCustomToken
 } from '@/utils/firebase'
 
 const PAGE_STATE = {
@@ -22,11 +24,10 @@ export default function FinishLogin() {
     const [pageState, setPageState] = useState(PAGE_STATE.LOADED)
 
     const signUserIn = () => {
-        console.log("called signUserIn " + num_times_called++)  
 
         setPageState(PAGE_STATE.LOADING)
         // Confirm the link is a sign-in with email link.
-        if (doIsSignInWithEmailLink(window.location.href)) {
+        if (router.query.token) {
 
             // Additional state parameters can also be passed via URL.
             // This can be used to continue the user's intended action before triggering
@@ -39,14 +40,16 @@ export default function FinishLogin() {
                 email = window.prompt('Please provide your email for confirmation');
             }
             
-            doSignInWithEmailLink(email, window.location.href).then((result) => {
+            doVerifyMagicLink(email, router.query.token).then((result) => {
+                return doSignInWithCustomToken(result.data.customToken)
+            })
+            .then(() => {
                 // Clear email from storage.
                 window.localStorage.removeItem('emailForSignIn');
 
                 // if user has signed up, the blocking auth cloud function should have already created the user.
                 // log them in
                 setPageState(PAGE_STATE.SUCCESS)
-
             })
             .catch((error) => {
                 // Some error occurred, you can inspect the code: error.code
@@ -56,6 +59,7 @@ export default function FinishLogin() {
             });
         } 
         else{
+            console.log("No token found in query params")
             setPageState(PAGE_STATE.ERROR)
         }
     }

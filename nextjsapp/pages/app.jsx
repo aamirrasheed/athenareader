@@ -75,6 +75,10 @@ function App() {
                 setUserWebsitesUnsubscribeLoading(data.subscriptions ? Object.fromEntries(Object.values(data.subscriptions).map(website => [website, false])) : {})
                 setLoading(false)
             }
+            else{
+                setLoading(false)
+                console.log("Unable to find user with uid:", authUser().uid)
+            }
         })
     }, [])
 

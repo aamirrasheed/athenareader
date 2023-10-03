@@ -13,6 +13,7 @@ import {
     signInWithEmailLink,
     signOut,
     connectAuthEmulator,
+    signInWithCustomToken,
 } from 'firebase/auth';
 
 import { 
@@ -82,6 +83,18 @@ const doSendSignInLinkToEmail = (email, actionCodeSettings) => {
 
 const doIsSignInWithEmailLink = (emailLink) => isSignInWithEmailLink(firebaseAuth, emailLink);
 
+const doSendMagicLink = (email) => {
+    const sendMagicLink = httpsCallable(firebaseFunctions, 'sendMagicLink');
+    return sendMagicLink({ email });
+};
+
+const doVerifyMagicLink = (email, token) => {
+    const verifyMagicLink = httpsCallable(firebaseFunctions, 'verifyMagicLink');
+    return verifyMagicLink({ email, token });
+}
+
+const doSignInWithCustomToken = (token) => signInWithCustomToken(firebaseAuth, token);
+
 const doSignInWithEmailLink = (email, emailLink) => signInWithEmailLink(firebaseAuth, email, emailLink);
 
 const doSignOut = () => signOut(firebaseAuth);
@@ -105,6 +118,9 @@ const doUnsubscribeUserFromWebsite = (url) => {
 }
 
 export {
+    doSendMagicLink,
+    doVerifyMagicLink,
+    doSignInWithCustomToken,
     doSendSignInLinkToEmail,
     doIsSignInWithEmailLink,
     doSignInWithEmailLink,
