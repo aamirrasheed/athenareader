@@ -224,7 +224,7 @@ Output:
 */
 exports.sendEmailAsSummarizedLinks = functions.pubsub.schedule('0 8 * * *').timeZone('America/Los_Angeles').onRun((context) => {
     console.log("Entering sendEmailAsSummarizedLinks")
-    const resend = new Resend("re_j4SQCzdZ_H3ykgopQjksBMy9gkmf8LwgU");
+    const resend = new Resend("re_guPE3JGT_Pn4H3Fs9mLWr7bwyznu1Ff64");
     const NUM_POSTS_PER_EMAIL = 3
 
     // Loop over all users
@@ -319,7 +319,7 @@ exports.sendEmailAsSummarizedLinks = functions.pubsub.schedule('0 8 * * *').time
                     const emailBody = assembleNSummarizedLinksEmail(postSnapshots);
 
                     const data = {
-                        from: 'Your Daily Newsletter <newsletter@sendittomy.email>',
+                        from: 'Your Daily Newsletter <newsletter@athenareader.com>',
                         to: [userSnapshot.val().email],
                         subject: "Your Daily Newsletter",
                         html: emailBody
