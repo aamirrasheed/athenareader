@@ -20,15 +20,6 @@ const {
     UNABLE_TO_CALL_FUNCTION_ERROR
 } = require('./utils');
 
-exports.createUserInDatabaseOnSignup = functions.auth.user().onCreate((user, context) => {
-    // create an entry for the user in realtime database
-    admin.database().ref(`users/${user.uid}`).set({
-        email: user.email,
-    });
-
-    return {result: "success"}
-})
-
 exports.sendMagicLink = functions.https.onCall(async (data, context) => {
     const email = data.email;
 
@@ -317,7 +308,6 @@ exports.sendEmailAsSummarizedLinks = functions.pubsub.schedule('0 8 * * *').time
                 // Step 5: send the email with the post data
                 .then(postSnapshots => {
                     const emailBody = assembleNSummarizedLinksEmail(postSnapshots);
-
                     const data = {
                         from: 'Your Daily Newsletter <newsletter@athenareader.com>',
                         to: [userSnapshot.val().email],
