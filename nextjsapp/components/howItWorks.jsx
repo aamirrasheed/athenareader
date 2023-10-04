@@ -3,7 +3,7 @@ function HowItWorks() {
     return ( 
     <section className="body-font">
         <div className="text-center">
-        <h1 className={title({ size: "sm"})}>It's dead simple. Here's how it works:</h1>
+        <h1 className={title({ size: "sm"})}>Here's how it works:</h1>
         </div>
     <div className="container px-5 py-12 mx-auto flex flex-col items-center">
         <div className="flex flex-col w-3/4 md:w-1/2 mb-12 items-left">
