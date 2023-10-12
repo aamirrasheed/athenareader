@@ -215,7 +215,7 @@ Output:
 */
 exports.sendEmailAsSummarizedLinks = functions.pubsub.schedule('0 8 * * *').timeZone('America/Los_Angeles').onRun((context) => {
     console.log("Entering sendEmailAsSummarizedLinks")
-    const resend = new Resend("re_guPE3JGT_Pn4H3Fs9mLWr7bwyznu1Ff64");
+    const resend = new Resend("re_BJgygfLu_D9yjxirD4gcToi62JVUsApgp");
     const NUM_POSTS_PER_EMAIL = 3
 
     // Loop over all users
