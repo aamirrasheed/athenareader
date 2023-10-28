@@ -1,0 +1,1 @@
+Some of the scripts that connect to Google Cloud APIs require an admin key JSON, which can be downloaded from your Google Cloud Console (google how to do it)
